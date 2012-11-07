@@ -454,6 +454,25 @@ yox.data.sources.instagram = (function(){
                 };
 
                 xhr.send(formData);
+            },
+            unlike: function(itemId, callback){
+                var formData = new FormData(),
+                    returned = false;
+
+                formData.append("access_token", accessToken);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("DEL", apiUrl + "media/" + itemId + "/likes");
+                xhr.onreadystatechange = function(e){
+                    if (!returned){
+                        returned = true;
+
+                        // I haven't found any way to verify that the request went through successfully, but it seems to work properly.
+                        callback && callback({ success: true });
+                    }
+                };
+
+                xhr.send(formData);
             }
         },
         sourceName: "Instagram"
