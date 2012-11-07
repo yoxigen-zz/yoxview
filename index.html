@@ -78,7 +78,7 @@
                         <input type="text" ng-model="usersFilter" placeholder="Search contacts" />
                         <a ng-repeat="user in users | orderBy:'name' | filter:usersFilter"
                            ng-click="selectUser(user)"
-                           class="innerLink"
+                           class="innerLink user_link"
                            ng-class="{selected:user.selected}"
                            href="?/{{currentSource.provider.name}}/user/{{user.id}}"
                            dir="{{getDirection(user.name)}}"
@@ -119,7 +119,7 @@
         <div id="viewer_left">
             <div id="viewer_view"></div>
             <div id="viewer_info">
-                <a id="viewer_info_author" class="innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}" ng-show="commentsClosed">
+                <a id="viewer_info_author" class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}" ng-show="commentsClosed">
                     <img class="avatar" ng-src="{{currentItem.author.avatar}}" title="{{currentItem.author.username || currentItem.author.name}}" ng-show="currentItem.author.avatar" />
                     <span class="user_link">{{currentItem.author.name}}</span>
                 </a>
@@ -142,7 +142,7 @@
             </div>
             <div id="viewer_comments_contents">
                 <section id="comments_user" class="comments_section_contents">
-                    <a id="comments_avatar" class="innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}">
+                    <a id="comments_avatar" class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}">
                         <img ng-show="currentItem.author.avatar" ng-src="{{currentItem.author.avatar}}" alt title="{{currentItem.author.username || currentItem.author.name}}" />
                         <span class="user_link">{{currentItem.author.username || currentItem.author.name}}</span>
                     </a>
@@ -175,12 +175,12 @@
 
                         </li>
                         <li ng-repeat="comment in currentItem.social.comments | orderBy:time:true" class="comment">
-                            <a class="comment_avatar innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                            <a class="comment_avatar innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
                                 <img class="avatar" ng-src="{{comment.user.avatar}}" title="{{comment.user.username || comment.user.name}}" />
                             </a>
                             <div class="comment_texts">
                                 <span class="timestamp">{{formatDate(comment.time)}}</span>
-                                <a class="user_link innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                                <a class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
                                     {{comment.user.username || comment.user.name}}
                                 </a>
                                 <p class="commentText" dir="{{getDirection(comment.text)}}" ng-bind-html-unsafe="formatText(comment.text)"></p>
@@ -203,7 +203,7 @@
                         </a>
                     </li>
                     <li ng-repeat="contact in likes">
-                        <a class="innerLink like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
+                        <a class="innerLink user_link like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
                             <img class="avatar" ng-src="{{contact.avatar}}" />
                             {{contact.username || contact.name}}
                         </a>
