@@ -37,15 +37,17 @@ function AppController($scope, path, apis){
             if (initialState)
                 $scope.$broadcast("state", initialState);
 
+            /*
             if (!initialState || initialState.home){
                 apis.createHomeApi();
             }
+            */
 
             path.onPopState.addListener(function(state){
                 if (!state || !state.source || state.home){
                     $scope.$apply(function(){
                         $scope.view = "home";
-                        apis.createHomeApi();
+                        //apis.createHomeApi();
                     });
                 }
 

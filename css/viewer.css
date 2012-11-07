@@ -198,6 +198,9 @@
     position: absolute;
     width: 35px;
     text-align: center;
+    height: 10px;
+    border: none;
+    box-shadow: none;
 }
 #viewer_comments #comments_likes h3{
     margin-bottom: 8px;
@@ -266,8 +269,15 @@
     background: url(../img/info_icons.png) no-repeat 0px 2px;
 
 }
-.commentsClosed #viewer_comments h3{ font-size: .8em }
-.commentsClosed #viewer_comments h3 span{ display: none }
+.commentsClosed #viewer_comments h3{ font-size: .8em; text-align: center; }
+.commentsClosed #viewer_comments h3 span, .commentsClosed .likeBtn{ display: none }
+.commentsClosed #viewer_comments h3 .likeIcon{
+    display: block;
+    padding: 0;
+    background-position: 8px -122px;
+    width: auto;
+}
+.commentsClosed #comments_openLikesBtn{ float: none; opacity: 1 }
 
 #comments_comments{ margin-bottom: 0 }
 #comments_comments h3
