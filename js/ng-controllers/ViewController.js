@@ -183,15 +183,19 @@ function ViewController($scope, apis, path){
     $scope.formatText = function(text){
         return text ? text.replace(linksRegex, function(result){
             var isExternalLink = /^h/.test(result),
-                href = isExternalLink ? result : "?/" + $scope.currentItem.source.sourceType.name + "/";
+                href = isExternalLink ? result : "?/" + $scope.currentItem.source.sourceType.name + "/",
+                className = "innerLink";
 
-            if (/^#/.test(result))
+            if (/^#/.test(result)){
                 href = href + "tag/" + result.slice(1);
+                className += " tag_link";
+            }
             else if (/^@/.test(result)){
                 href = href + "user/" + result.slice(1);
+                className += " user_link";
             }
 
-            return "<a class='innerLink' href=\"" + href + "\"" + (isExternalLink ? " target='_blank'" : "") + ">" + result + "</a>"
+            return "<a class='" + className + "' href=\"" + href + "\"" + (isExternalLink ? " target='_blank'" : "") + ">" + result + "</a>"
         }) : null;
     };
 
