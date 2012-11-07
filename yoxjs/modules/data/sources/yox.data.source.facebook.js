@@ -15,7 +15,7 @@ yox.data.sources.facebook = (function(){
 
             FB.init({
                 appId      : apiKey, // App ID
-                channelUrl : '//www.yoxigen.com/app/channel.html', // Channel File
+                channelUrl : '//yoxigen.github.com/yoxview/channel.html', // Channel File
                 status     : true, // check login status
                 cookie     : true, // enable cookies to allow the server to access the session
                 xfbml      : true  // parse XFBML

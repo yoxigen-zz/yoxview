@@ -393,7 +393,7 @@ yox.data.sources.picasa = (function(){
             location.href = "https://accounts.google.com/o/oauth2/auth?response_type=token&client_id=" + clientId +
                 "&scope=" + encodeURIComponent("https://picasaweb.google.com/data/") + "+" + encodeURIComponent("https://www.googleapis.com/auth/userinfo.profile") +
                 "&state=picasa&redirect_uri=" +
-                encodeURIComponent("http://www.yoxigen.com/app/index.html");
+                encodeURIComponent("http://yoxigen.github.com/yoxview");
         },
         map: { pageSize: "max-results", offset: "start-index" },
         match: function(source){ return source.url && picasaRegex.test(source.url); },

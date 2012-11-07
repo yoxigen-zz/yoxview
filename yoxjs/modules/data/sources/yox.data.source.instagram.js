@@ -5,7 +5,7 @@ yox.data.sources.instagram = (function(){
         },
         apiUrl = "https://api.instagram.com/v1/",
         clientId = "d5030467b47e4d9691e566b5a47d5e81",
-        redirectUri = "http://www.yoxigen.com/app/index.html",
+        redirectUri = "http://yoxigen.github.com/yoxview",
         accessToken = localStorage.getItem("yox_instagram_token"),
         isLogin = !!accessToken,
         currentUser,
