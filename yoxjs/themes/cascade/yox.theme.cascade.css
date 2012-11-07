@@ -1,0 +1,39 @@
+.yox-theme-cascade::after{
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.yox-theme-cascade-column{
+    float: left;
+}
+
+.yox-theme-cascade-item{
+    background: #191919;
+    margin-bottom: 3px;
+}
+.yox-theme-cascade-thumbnail{
+    display: block;
+    text-align: center;
+    background: #0b0b0b;
+}
+.yox-theme-cascade-thumbnail img{
+    width: 100%;
+}
+
+.yox-theme-cascade .commentsList{
+    padding: 0 5px;
+    font-size: 0.9em;
+    border-top: solid 1px #0B0B0B;
+    box-shadow: 0 1px 0 #303030 inset;
+}
+
+.yox-theme-cascade .comment{ padding: 2px 0 8px 0; }
+.yox-theme-cascade .comment .avatar{
+    width: 30px;
+    height: 30px;
+    margin-top: 7px;
+}
+.yox-theme-cascade .comment_texts{
+    margin-left: 42px;
+}
