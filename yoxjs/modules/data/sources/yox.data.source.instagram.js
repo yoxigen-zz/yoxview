@@ -462,7 +462,7 @@ yox.data.sources.instagram = (function(){
                 formData.append("access_token", accessToken);
 
                 var xhr = new XMLHttpRequest();
-                xhr.open("DEL", apiUrl + "media/" + itemId + "/likes");
+                xhr.open("DELETE", apiUrl + "media/" + itemId + "/likes");
                 xhr.onreadystatechange = function(e){
                     if (!returned){
                         returned = true;
