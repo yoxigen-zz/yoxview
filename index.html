@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html ng-app="AppModule" ng-csp xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Yoxview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Muli:400,400italic' rel='stylesheet' type='text/css'>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/touch-icon-57.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="img/touch-icon-72.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="img/touch-icon-114.png" />
+    <link rel="apple-touch-icon-precomposed" href="img/touch-icon-114.png"/>
+    <link rel="Stylesheet" type="text/css" href="css/yox.lightbox.css" />
+    <link rel="Stylesheet" type="text/css" href="yoxjs/themes/cascade/yox.theme.cascade.css" />
+    <link rel="Stylesheet" type="text/css" href="css/app.css" />
+    <link rel="Stylesheet" type="text/css" href="css/albums.css" />
+    <link rel="Stylesheet" type="text/css" href="css/viewer.css" />
+    <script src="js/external/angular-1.0.1.min.js"></script>
+    <script src="js/ga.js"></script>
+</head>
+<body ng-controller="AppController" delegate="click:.innerLink:selectUser">
+    <header ng-cloak>
+        <h1 id="appName">
+            <img id="logo" src="img/logo.png" />
+        </h1>
+        <div id="search" ng-class="{open:searchOpen}">
+            <input id="searchInput" type="text" placeholder="Search for people, albums and places" />
+            <a id="searchBtn" ng-click="searchOpen = !searchOpen"></a>
+        </div>
+        <h2 id="title">
+            <span ng-show="path.length" class="sourceIcon source_{{currentSource.provider.name}}"></span>
+            <span ng-repeat="breadcrumb in path">{{breadcrumb.name}}</span>
+        </h2>
+    </header>
+    <section id="contents" ng-cloak>
+        <div id="navs" ng-controller="AccountsController" class="nav_depth_{{currentNav + 1}}">
+            <div id="navsWrap">
+                <nav id="accounts" class="thumbnailsNav thumbnailsNav_1" ng-cloak>
+                    <div class="thumbnailsNav_scroll">
+                        <a ng-repeat="source in sources"
+                           ng-click="selectSource(source)"
+                           class="folder"
+                           ng-class="{selected:source.selected, loggedIn:source.currentUser}">
+                        <span class='sourceIcon source_{{source.provider.name}}' ng-show="!source.currentUser.avatar"></span>
+                        <img class="sourceAvatar" ng-src="{{source.currentUser.avatar}}" ng-show="source.currentUser.avatar" />
+                        <span class="sourceName">{{source.provider.sourceName}}</span>
+                        <span class="sourceUserName" ng-show="source.currentUser">{{source.currentUser.username || source.currentUser.name}}</span>
+                        <span class="folderIcon"></span></a>
+                    </div>
+                </nav>
+                <nav class="thumbnailsNav thumbnailsNav_2" ng-cloak>
+                    <div class="thumbnailsNav_scroll">
+                        <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                        <div class="thumbnailsNav_sourceUser" ng-show="currentSource.currentUser">
+                            <img class="sourceAvatar" ng-src="{{currentSource.currentUser.avatar}}" ng-show="currentSource.currentUser.avatar" />
+                            <span class="sourceName">{{currentSource.provider.sourceName}}</span>
+                            <span class="sourceUserName">{{currentSource.currentUser.username || currentSource.currentUser.name}}</span>
+                        </div>
+                        <a ng-repeat="feed in sourceFeeds"
+                           ng-click="selectFeed(feed)"
+                           ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
+                    </div>
+                </nav>
+                <nav class="thumbnailsNav thumbnailsNav_3 smallNav" ng-show="currentFeed.childrenType == 'albums'" ng-cloak>
+                    <div class="thumbnailsNav_scroll">
+                        <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                        <a ng-repeat="album in albums | orderBy:'title'"
+                           ng-click="selectAlbum(album)"
+                           ng-class="{selected:album.selected}"
+                           ng-show="album.data.album.imageCount"
+                           dir="{{getDirection(album.title)}}"
+                        >{{album.title}}<span class="folderIcon"></span></a>
+                    </div>
+                </nav>
+                <nav class="thumbnailsNav thumbnailsNav_3 smallNav" ng-show="currentFeed.childrenType == 'users'" ng-cloak>
+                    <div class="thumbnailsNav_scroll">
+                        <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                        <input type="text" ng-model="usersFilter" placeholder="Search contacts" />
+                        <a ng-repeat="user in users | orderBy:'name' | filter:usersFilter"
+                           ng-click="selectUser(user)"
+                           class="innerLink"
+                           ng-class="{selected:user.selected}"
+                           href="?/{{currentSource.provider.name}}/user/{{user.id}}"
+                           dir="{{getDirection(user.name)}}"
+                                >
+                            <img class="avatar"ng-src="{{user.avatar}}" />
+                        {{user.name}}<span class="folderIcon"></span></a>
+                    </div>
+                </nav>
+            </div>
+            <nav class="thumbnailsNav thumbnailsNav_user" ng-cloak ng-show="user">
+                <div class="thumbnailsNav_scroll">
+                    <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                    <div class="thumbnailsNav_sourceUser">
+                        <img class="sourceAvatar" ng-src="{{user.avatar}}" ng-show="user.avatar" />
+                        <span class="sourceName">{{user.name}}</span>
+                        <span class="sourceUserName" ng-show="user.username">{{user.username}}</span>
+                    </div>
+                    <a ng-repeat="feed in user.feeds"
+                       ng-click="selectFeed(feed)"
+                       ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
+                </div>
+            </nav>
+            <div id="navLoader" ng-show="loading">
+                <div class="largeLoader"></div>
+            </div>
+        </div>
+        <section id="albumsThumbnails" class="largeScroll" ng-show="view == 'albums'"></section>
+        <section id="thumbnails" class="largeScroll" ng-show="view == 'thumbnails'"></section>
+        <section id="login" ng-show="view == 'login'">
+            <div id="loginContents">
+                <a id="loginBtn" ng-click="login()" class="loginBtn_{{currentSource.provider.name}}"></a>
+                <p ng-bind="currentSource.provider.loginText"></p>
+            </div>
+        </section>
+        <section id="home" class="largeScroll" ng-show="view == 'home'"></section>
+    </section>
+    <div id="viewer" ng-controller="ViewController" ng-class="{commentsClosed:commentsClosed, enabled:viewEnabled}">
+        <div id="viewer_left">
+            <div id="viewer_view"></div>
+            <div id="viewer_info">
+                <a id="viewer_info_author" class="innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}" ng-show="commentsClosed">
+                    <img class="avatar" ng-src="{{currentItem.author.avatar}}" title="{{currentItem.author.username || currentItem.author.name}}" ng-show="currentItem.author.avatar" />
+                    <span class="user_link">{{currentItem.author.name}}</span>
+                </a>
+                <p id="viewer_info_caption" ng-bind-html-unsafe="formatText(currentItem.title)" dir="{{getDirection(currentItem.title)}}"></p>
+                <ul id="viewer_info_people" ng-show="currentItem.people">
+                    <li>With </li>
+                    <li ng-repeat="person in currentItem.people">
+                        <a class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{person.id}}">{{person.name}}</a>{{getListItemSeparator($index, currentItem.people.length);}}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="viewer_comments"
+             ng-class="{open:!commentsClosed}">
+            <div id="comments_back">
+                <a class="backBtn" ng-click="close()"><span class="backIcon"></span>Back</a>
+                <a id="view_comments_minimizeBtn" ng-click="toggleCommentsFix($event)" title="{{minimizeBtnTitle}}">
+                    <span class="minimizeIcon"></span>
+                </a>
+            </div>
+            <div id="viewer_comments_contents">
+                <section id="comments_user" class="comments_section_contents">
+                    <a id="comments_avatar" class="innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}">
+                        <img ng-show="currentItem.author.avatar" ng-src="{{currentItem.author.avatar}}" alt title="{{currentItem.author.username || currentItem.author.name}}" />
+                        <span class="user_link">{{currentItem.author.username || currentItem.author.name}}</span>
+                    </a>
+                    <span class="timestamp">{{formatDate(currentItem.time)}}</span>
+                </section>
+                <section id="comments_likes">
+                    <h3>
+                        <span class="icon likeIcon"></span>
+                        <a ng-click="toggleLike($event)" class="likeBtn" ng-bind="getLikeCommand()"></a>
+                        <a id="comments_openLikesBtn" ng-class="{open:likesOpen}" ng-click="toggleLikesOpen()">
+                            {{getCountStr(currentItem.social.likesCount)}}
+                            <span>Likes</span>
+                            <span class="icon chevronIcon" ng-class="{chevronIconClose:likesOpen}"></span>
+                        </a>
+                    </h3>
+                </section>
+                <section id="comments_comments">
+                    <h3>{{getCountStr(currentItem.social.commentsCount)}} <span>Comments</span></h3>
+                    <ul id="comments_list" class="commentsList comments_section_contents">
+                        <li class="comment">
+                            <a class="comment_avatar"><img class="avatar" ng-src="{{currentUser.avatar}}" title="{{currentUser.username || currentUser.name}}" /></a>
+                            <div id="comments_comment_edit">
+                                <a id="writeCommentButton" ng-click="writeComment()" ng-show="!editingComment">Write a comment...</a>
+                                <div ng-show="editingComment" ng-class="{posting:postingComment}">
+                                    <textarea placeholder="Write a comment..." ng-model="commentWriteText" ng-disabled="postingComment"></textarea>
+                                    <input type="button" value="Post on {{currentItem.source.sourceType.sourceName}}" ng-disabled="postingComment" ng-click="postComment()" />
+                                    <img src="img/small_loader.png" class="loader" ng-show="postingComment" />
+                                </div>
+                            </div>
+
+                        </li>
+                        <li ng-repeat="comment in currentItem.social.comments | orderBy:time:true" class="comment">
+                            <a class="comment_avatar innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                                <img class="avatar" ng-src="{{comment.user.avatar}}" title="{{comment.user.username || comment.user.name}}" />
+                            </a>
+                            <div class="comment_texts">
+                                <span class="timestamp">{{formatDate(comment.time)}}</span>
+                                <a class="user_link innerLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                                    {{comment.user.username || comment.user.name}}
+                                </a>
+                                <p class="commentText" dir="{{getDirection(comment.text)}}" ng-bind-html-unsafe="formatText(comment.text)"></p>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+                <div class="largeLoader" ng-show="commentsLoading"></div>
+            </div>
+            <div id="viewer_likes" ng-class="{open:likesOpen, allLikes:allLikes}">
+                <h3>{{getCountStr(currentItem.social.likesCount)}} Likes
+                    <a ng-click="toggleLikesOpen()"><span class="chevronIcon" ng-class="{chevronIconClose:likesOpen}" title="{{minimizeBtnTitle}}"></span></a>
+                </h3>
+                <ul id="viewer_likes_list">
+                    <li>
+                        <a id="viewer_likes_like" class="like_contact" ng-click="toggleLike($event)" ng-class="{liked:currentItem.social.like}" title="Click to {{getLikeCommand(true)}}">
+                            <img class="avatar" ng-src="{{currentUser.avatar}}" />
+                            {{currentUser.username || currentUser.name}}
+                            <span class='like_contact_add'></span>
+                        </a>
+                    </li>
+                    <li ng-repeat="contact in likes">
+                        <a class="innerLink like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
+                            <img class="avatar" ng-src="{{contact.avatar}}" />
+                            {{contact.username || contact.name}}
+                        </a>
+                    </li>
+                    <li ng-show="!allLikes">
+                        <a id="viewer_likes_getMoreBtn" ng-click="getMoreLikes()">
+                            Show more
+                            <span class="icon downIcon" ng-show="!loadingLikes"></span>
+                            <img src="img/small_loader.png" ng-show="loadingLikes" id="viewer_likes_getMoreBtn_loading" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script type="text/javascript" src="yoxjs/polyfills/polyfill.bind.js"></script>
+    <script type="text/javascript" src="yoxjs/polyfills/polyfill.classlist.js"></script>
+    <script type="text/javascript" src="yoxjs/yox.js"></script>
+    <script type="text/javascript" src="yoxjs/yox.utils.js"></script>
+    <script type="text/javascript" src="yoxjs/yox.cache.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/yox.data.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/yox.data.item.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/thumbnails/yox.thumbnails.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.picasa.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/sha.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.flickr.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.instagram.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.facebook.js"></script>
+    <script type="text/javascript" src="yoxjs/yox.eventBus.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/view/yox.view.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/view/yox.view.cache.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/scroll/yox.scroll.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/view/transitions/yox.view.transition.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/view/transitions/yox.view.transition.none.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/controller/yox.controller.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/statistics/yox.statistics.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/statistics/reporters/yox.statistics.reporter.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/statistics/reporters/yox.statistics.reporter.ga.js"></script>
+    <script type="text/javascript" src="yoxjs/themes/yox.theme.js"></script>
+    <script type="text/javascript" src="yoxjs/themes/wall/yox.theme.wall.js"></script>
+    <script type="text/javascript" src="yoxjs/themes/classic/yox.theme.classic.js"></script>
+    <script type="text/javascript" src="yoxjs/themes/cascade/yox.theme.cascade.js"></script>
+
+    <script src="js/AppModule.js"></script>
+    <script src="js/ng-services/PathService.js"></script>
+    <script src="js/ng-services/ApisService.js"></script>
+    <script src="js/ng-directives/DelegateDirective.js"></script>
+    <script src="js/ng-controllers/AccountsController.js"></script>
+    <script src="js/ng-controllers/HeaderController.js"></script>
+    <script src="js/ng-controllers/ViewController.js"></script>
+    <script src="js/ng-controllers/AppController.js"></script>
+</body>
+</html>

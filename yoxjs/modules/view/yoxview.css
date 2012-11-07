@@ -1,0 +1,27 @@
+.yoxviewFrame{
+	position: absolute;
+	overflow: hidden; 
+	border: solid 1px #666;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.yoxviewFrame_mobile{ border: none }
+.yoxviewFrame_fill{ border: none }
+
+.yoxviewImg{
+	position: absolute;
+	border: none;
+
+	display: block;
+	z-index: 1;
+}
+
+.yoxviewFrame_fit .yoxviewImg{
+    width: 100%;
+    height: 100%;
+}
+
+.yoxviewFrame div#info{ background: rgba(0,0,0,0.5); color: White; height: 30px; bottom: 0; left: 0; width: 100%; line-height: 30px; padding-left: 10px;}
