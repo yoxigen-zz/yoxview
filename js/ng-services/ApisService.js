@@ -331,19 +331,6 @@ angular.module('ApisModule', ["PathModule"])
         return null;
     }
 
-        /*
-    $("body").on("click", "a.innerLink", function(e){
-        //if (!this.target){
-            var linkData = getDataFromUrl(this.href);
-            if (linkData){
-                e.preventDefault();
-                viewerApi.modules.view.close({ fromHistory: true });
-                thumbnailsApi.data.source(linkData);
-                currentDataSource = linkData;
-            }
-        //}
-    });
-          */
     return{
         addEventListener: eventBus.addEventListener,
         albums: albumsApi,
