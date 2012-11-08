@@ -507,7 +507,7 @@ yox.data.sources.facebook = (function(){
                 isLoggedIn(function(loginStatus){
                     if (loginStatus){
                         var userFromCache = cache().getItem("user");
-                        if (userFromCache){
+                        if (!userId && userFromCache){
                             currentUser = userFromCache;
                             callback(currentUser);
                             return currentUser;
