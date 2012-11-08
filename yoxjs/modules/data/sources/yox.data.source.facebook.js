@@ -425,7 +425,7 @@ yox.data.sources.facebook = (function(){
             });
         }
         else if (source.id === "albums"){
-            getAlbums(function(items){
+            getAlbums(source.userId, function(items){
                 returnData.items = items;
                 if(source.cache)
                     cache().setItem(source.id, { items: returnData.items }, { expiresIn: source.cacheTime }); // Albums are cached for 6 hours
