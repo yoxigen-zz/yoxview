@@ -521,10 +521,11 @@ yox.data.sources.facebook = (function(){
                                 source: dataSourceName
                             };
 
-                            if (!userId || userId === "me")
+                            if (!userId || userId === "me"){
                                 currentUser = user;
+	                            cache().setItem("user", user, { expiresIn: 86400 });
+                            }
 
-                            cache().setItem("user", user, { expiresIn: 86400 });
                             callback(user);
                         });
                     }
