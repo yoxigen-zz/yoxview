@@ -411,7 +411,7 @@ yox.themes.wall = function(data, options){
             }
 
             visibleRows = { firstRow: visibleRowsIndexes.first, lastRow: visibleRowsIndexes.last };
-        }, 200);
+        }, 120);
     }
     var handleResize = false,
         onResize;
