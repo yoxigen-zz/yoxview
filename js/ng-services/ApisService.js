@@ -161,7 +161,7 @@ angular.module('ApisModule', ["PathModule"])
                     viewerApi.triggerEvent("resize");
 
                 var state = { source: currentProvider.name, view: true };
-                if (path.currentState.feed)
+                if (path.currentState && path.currentState.feed)
                     state.feed = path.currentState.feed;
 
                 if (currentAlbumId)

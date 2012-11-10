@@ -339,15 +339,18 @@ yox.utils = {
         var diff = (((new Date()).getTime() - date.getTime()) / 1000),
             day_diff = Math.floor(diff / 86400);
 
-        if ( isNaN(day_diff) || day_diff < 0 || day_diff >= 31 )
+        if ( isNaN(day_diff) || day_diff < 0)
             return;
 
-        return day_diff == 0 && (
-            diff < 60 && diff + "s" ||
+        return (day_diff == 0 && (
+            diff < 60 && "Just now" ||
                 diff < 3600 && Math.floor( diff / 60 ) + "m" ||
                 diff < 86400 && Math.floor( diff / 3600 ) + "h") ||
             day_diff < 7 && day_diff + "d" ||
-            day_diff < 31 && Math.ceil( day_diff / 7 ) + "w";
+            day_diff < 31 && Math.ceil( day_diff / 7 ) + "w" ||
+            day_diff < 62 && "1 month" ||
+            day_diff < 365 && Math.floor(day_diff / 30.416) + " months" ||
+            Math.floor(day_diff / 365) + "y");
     }
 
     yox.utils.date.getTimeDifference = prettyDate;
