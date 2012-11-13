@@ -299,7 +299,7 @@ angular.module('ApisModule', ["PathModule"])
         if (isViewerOpen !== !!stateView){
             if (stateView){
                 eventBus.triggerEvent("toggleView", { isEnabled: true });
-                viewerApi.modules.view.selectItem(state.itemIndex || 0);
+                //viewerApi.modules.view.selectItem(state.itemIndex || 0);
             }
             else
                 viewerApi.modules.view.close({ fromHistory: true });

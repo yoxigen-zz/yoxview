@@ -1,1 +1,1 @@
-angular.module("AppModule", ["PathModule", "ApisModule", "DelegateModule"]);
+angular.module("AppModule", ["PathModule", "ApisModule", "DelegateModule", "StateModule"]);

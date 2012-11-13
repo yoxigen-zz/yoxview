@@ -90,7 +90,7 @@
             </div>
             <nav class="thumbnailsNav thumbnailsNav_user" ng-cloak ng-show="user">
                 <div class="thumbnailsNav_scroll">
-                    <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                    <a class="backNav" ng-click="backFromUser()"><span class="backIcon"></span>Back</a>
                     <div class="thumbnailsNav_sourceUser">
                         <img class="sourceAvatar" ng-src="{{user.avatar}}" ng-show="user.avatar" />
                         <span class="sourceName">{{user.name}}</span>
@@ -253,9 +253,9 @@
     <script src="js/AppModule.js"></script>
     <script src="js/ng-services/PathService.js"></script>
     <script src="js/ng-services/ApisService.js"></script>
+    <script src="js/ng-services/StateService.js"></script>
     <script src="js/ng-directives/DelegateDirective.js"></script>
     <script src="js/ng-controllers/AccountsController.js"></script>
-    <script src="js/ng-controllers/HeaderController.js"></script>
     <script src="js/ng-controllers/ViewController.js"></script>
     <script src="js/ng-controllers/AppController.js"></script>
 </body>

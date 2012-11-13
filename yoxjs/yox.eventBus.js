@@ -118,6 +118,17 @@ yox.eventBus = function(){
 
         return false;
     };
+
+    this.getEventPair = function(eventName){
+        return {
+            addListener: function(handler){
+                self.addEventListener(eventName, handler);
+            },
+            removeListener: function(handler){
+                self.removeEventListener(eventName, handler);
+            }
+        };
+    }
 };
 
 yox.eventBus.prototype = {

@@ -1,4 +1,4 @@
-function AccountsController($scope, path, apis){
+function AccountsController($scope, path, apis, state){
     var availableSources = ["facebook", "instagram", "picasa"];
 
     $scope.sources = getSources();
@@ -41,56 +41,22 @@ function AccountsController($scope, path, apis){
         return null;
     }
 
-    $scope.selectSource = function(source, forceSelect, state){
-        if ((source && !$scope.currentSource) || source.provider.name !== $scope.currentSource.provider.name || forceSelect){
+    state.onSourceChange.addListener(function(newSource){
+        var source = findSource(newSource.name);
+        if (source){
             if ($scope.currentSource)
-                delete $scope.currentSource.selected;
+                $scope.currentSource.selected = false;
 
             source.selected = true;
             $scope.$parent.currentSource = $scope.currentSource = source;
 
-            function setFeeds(){
-                $scope.sourceFeeds = source.provider.feeds;
-                $scope.currentNav = 1;
-
-                var selectedFeed;
-                if (state && state.feed){
-                    for(var i= 0, feed; feed = source.provider.feeds[i]; i++){
-                        if (feed.id === state.feed){
-                            selectedFeed = feed;
-                            break;
-                        }
-                    }
-                }
-
-                if (!selectedFeed)
-                    selectedFeed = source.provider.feeds[0];
-
-                $scope.selectFeed(selectedFeed, state);
-            }
-
-            if (source.provider.requireAuth){
-                source.provider.isLoggedIn(function(isLoggedIn){
-                    if (!isLoggedIn){
-                        setTimeout(function(){
-                            $scope.$apply(function(){
-                                $scope.$parent.view = "login";
-                            });
-                        });
-                    }
-                    else
-                        setFeeds();
-                });
-            }
-            else
-                setFeeds();
-        }
-        else if (source.provider.name === $scope.currentSource.provider.name){
+            $scope.sourceFeeds = newSource.feeds;
             $scope.currentNav = 1;
         }
+    });
 
-        if (!state)
-            path.pushState({ source: source.provider.name });
+    $scope.selectSource = function(source){
+        state.setState({ source: source.provider });
     };
 
     $scope.selectFeed = function(feed, state){
@@ -229,6 +195,11 @@ function AccountsController($scope, path, apis){
         }
     };
 
+    $scope.backFromUser = function(){
+        $scope.user = null;
+        path.back();
+    };
+
     $scope.getDirection = yox.utils.strings.getDirection;
 
     $scope.$on("login", function(e, args){
@@ -327,4 +298,4 @@ function AccountsController($scope, path, apis){
 
 }
 
-AccountsController.$inject = ["$scope", "path", "apis"];
+AccountsController.$inject = ["$scope", "path", "apis", "state"];

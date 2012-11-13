@@ -1,4 +1,4 @@
-function AppController($scope, path, apis){
+function AppController($scope, path, state){
     var views = ["home", "sources", "albums", "thumbnails"],
         userUrlRegex = /\?\/(\w+)\/user\/([^\/\?$]+)/;
 
@@ -29,6 +29,12 @@ function AppController($scope, path, apis){
         }
     };
 
+    state.onModeChange.addListener(function(e){
+        //$scope.$apply(function(){
+            $scope.view = e.mode;
+        //});
+    });
+
     function onInitialState(){
         window.removeEventListener("popstate", onInitialState, false);
         setTimeout(function(){
@@ -58,4 +64,4 @@ function AppController($scope, path, apis){
     window.addEventListener("popstate", onInitialState, false);
 }
 
-AppController.$inject = ["$scope", "path", "apis"];
+AppController.$inject = ["$scope", "path", "state"];

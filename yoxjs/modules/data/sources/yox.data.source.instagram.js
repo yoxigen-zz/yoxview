@@ -376,10 +376,11 @@ yox.data.sources.instagram = (function(){
                         else
                             userData = { id: userId, source: dataSourceName };
 
-                        if (!userId)
+                        if (!userId){
                             currentUser = userData;
+                            localStorage.setItem("yox_instagram_user", JSON.stringify(userData));
+                        }
 
-                        localStorage.setItem("yox_instagram_user", JSON.stringify(userData));
                         callback(userData);
                     }
                 });

@@ -35,7 +35,7 @@ yox.data.prototype = {
      *
      * @param {Object[]|Object} sourceArr An array of source data objects (or a single object) to add.
      */
-    addSources: function(sourceArr){
+    addSources: function(sourceArr, callback){
         var deferredPromises = [],
             sources = sourceArr instanceof Array ? sourceArr : arguments,
             self = this;
@@ -50,7 +50,8 @@ yox.data.prototype = {
         }
 
         $.when.apply(this, deferredPromises).done(function () {
-            var totalItemsCount = self.countItems();
+            var totalItemsCount = self.countItems(),
+                dataSources = Array.prototype.slice.call(arguments, 0);
 
             for(var sourceIndex=0, source; sourceIndex < arguments.length; sourceIndex++){
                 source = arguments[sourceIndex];
@@ -70,7 +71,9 @@ yox.data.prototype = {
             }
 
             self.isLoading = false;
-            self.triggerEvent("loadSources", Array.prototype.slice.call(arguments, 0));
+            self.triggerEvent("loadSources", dataSources);
+
+            callback && callback(dataSources)
         });
     },
     addNextSource: function(){
@@ -243,7 +246,7 @@ yox.data.prototype = {
      * Replaces all data in the yox.data object with the given source(s).
      * @param {Object} sources One or more source data objects (for more than one, pass the method multiple params).
      */
-    source: function(sources){
+    source: function(sources, callback){
         this.clear();
         this.addSources.apply(this, arguments);
     },
