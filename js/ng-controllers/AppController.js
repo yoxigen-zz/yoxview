@@ -30,38 +30,12 @@ function AppController($scope, path, state){
     };
 
     state.onModeChange.addListener(function(e){
-        //$scope.$apply(function(){
-            $scope.view = e.mode;
-        //});
-    });
-
-    function onInitialState(){
-        window.removeEventListener("popstate", onInitialState, false);
         setTimeout(function(){
-            var initialState = path.getFeedDataFromUrl();
-            //path.pushState(initialState);
-            if (initialState)
-                $scope.$broadcast("state", initialState);
-
-            /*
-            if (!initialState || initialState.home){
-                apis.createHomeApi();
-            }
-            */
-
-            path.onPopState.addListener(function(state){
-                if (!state || !state.source || state.home){
-                    $scope.$apply(function(){
-                        $scope.view = "home";
-                        //apis.createHomeApi();
-                    });
-                }
-
-                $scope.$broadcast("state", state);
+            $scope.$apply(function(){
+                $scope.view = e.mode;
             });
-        }, 5);
-    }
-    window.addEventListener("popstate", onInitialState, false);
+        });
+    });
 }
 
 AppController.$inject = ["$scope", "path", "state"];

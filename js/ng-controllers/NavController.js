@@ -1,4 +1,4 @@
-function AccountsController($scope, path, apis, state){
+function NavController($scope, path, apis, state){
     var availableSources = ["facebook", "instagram", "picasa"];
 
     $scope.sources = getSources();
@@ -41,47 +41,53 @@ function AccountsController($scope, path, apis, state){
         return null;
     }
 
-    state.onSourceChange.addListener(function(newSource){
-        var source = findSource(newSource.name);
+    state.onSourceChange.addListener(function(e){
+        var source = findSource(e.source.name);
         if (source){
             if ($scope.currentSource)
                 $scope.currentSource.selected = false;
 
             source.selected = true;
             $scope.$parent.currentSource = $scope.currentSource = source;
-
-            $scope.sourceFeeds = newSource.feeds;
+            $scope.sourceFeeds = e.source.feeds;
             $scope.currentNav = 1;
         }
     });
 
+    state.onFeedChange.addListener(function(e){
+        setTimeout(function(){
+            $scope.$apply(function(){
+                if ($scope.currentFeed)
+                    $scope.currentFeed.selected = false;
+
+                for(var i= 0, feed; feed = $scope.sourceFeeds[i]; i++){
+                    if (feed.id === e.feed.id){
+                        feed.selected = true;
+                        $scope.currentFeed = feed;
+                        break;
+                    }
+                }
+
+                if (e.feed.hasChildren){
+                    $scope.currentNav = 2;
+                }
+                else{
+                    $scope.currentNav = 1;
+                }
+            });
+        });
+    });
+
     $scope.selectSource = function(source){
         state.setState({ source: source.provider });
+        $scope.currentNav = 1;
     };
 
-    $scope.selectFeed = function(feed, state){
-        if ($scope.currentFeed === feed){
-            setTimeout(function(){
-                $scope.$apply(function(){
-                    if (feed.hasChildren){
-                        $scope.currentNav = 2;
-                        $scope.$parent.view = "albums";
-                    }
-                    else{
-                        $scope.currentNav = 1;
-                        $scope.$parent.view = "thumbnails";
-                    }
-                });
-            });
-            return;
-        }
-
-        if ($scope.currentFeed)
-            $scope.currentFeed.selected = false;
-
-        feed.selected = true;
-        $scope.currentFeed = feed;
-
+    $scope.selectFeed = function(feed){
+        state.setState({
+            feed: feed
+        });
+        /*
         if (feed.childrenType === "users"){
             $scope.loading = true;
             $scope.currentSource.provider.load(feed, function(data){
@@ -123,13 +129,14 @@ function AccountsController($scope, path, apis, state){
                     apis.thumbnails.data.source(sourceData);
                 }, 1);
             }
-        }
+            */
+        //}
 
-        $scope.$emit("titleChange", [feed]);
-        apis.albums.triggerEvent("openFeed", { provider: $scope.currentSource.provider, feed: feed });
+        //$scope.$emit("titleChange", [feed]);
+        //apis.albums.triggerEvent("openFeed", { provider: $scope.currentSource.provider, feed: feed });
 
-        if (!state)
-            path.pushState({ source: $scope.currentSource.provider.name, feed: feed.id });
+        //if (!state)
+            //path.pushState({ source: $scope.currentSource.provider.name, feed: feed.id });
     };
 
     var albumIdToSelectAfterLoad;
@@ -229,9 +236,11 @@ function AccountsController($scope, path, apis, state){
         $scope.selectFeed(feed, { source: user.source, user: user.id, feed: feed.id });
     };
 
+    /*
     function getUserFromUserId(source, userId, callback){
         yox.data.sources[source].getUser(userId, callback);
     }
+
 
     function getUserFromState(state){
         if (state && state.user && state.source && (!$scope.user || state.user !== $scope.user.id)){
@@ -244,11 +253,12 @@ function AccountsController($scope, path, apis, state){
             });
         }
     }
-    /*
+
     $scope.$on("selectUser", function(e, state){
         getUserFromState(state);
     });
 */
+    /*
     $scope.$on("state", function(e, state){
         if (state && state.user){
             getUserFromState(state);
@@ -258,16 +268,16 @@ function AccountsController($scope, path, apis, state){
 
             if (apis.viewer){
                 if (state.view && !apis.viewer.modules.view.isOpen()){
-                    /*
-                    function onLoad(){
-                        if (state.itemIndex){
-                            apis.viewer.modules.view.selectItem(state.itemIndex);
-                        }
-                        apis.openViewer();
-                        apis.thumbnails.data.removeEventListener("loadSources", onLoad);
-                    }
-                    apis.thumbnails.data.addEventListener("loadSources", onLoad);
-                    */
+
+                    //function onLoad(){
+                        //if (state.itemIndex){
+                          //  apis.viewer.modules.view.selectItem(state.itemIndex);
+                        //}
+                        //apis.openViewer();
+                        //apis.thumbnails.data.removeEventListener("loadSources", onLoad);
+                    //}
+                    //apis.thumbnails.data.addEventListener("loadSources", onLoad);
+
                 }
             }
             $scope.selectSource(source, true, state);
@@ -295,7 +305,8 @@ function AccountsController($scope, path, apis, state){
             getUserFromState(state);
         }
     });
+*/
 
 }
 
-AccountsController.$inject = ["$scope", "path", "apis", "state"];
+NavController.$inject = ["$scope", "path", "apis", "state"];

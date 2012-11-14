@@ -1,5 +1,5 @@
-angular.module('ApisModule', ["PathModule"])
-.factory('apis', function(path) {
+angular.module('ApisModule', ["PathModule", "StateModule"])
+.factory('apis', function(path, state) {
     var viewerApi,
         thumbnailsApi,
         albumsApi,
@@ -36,17 +36,11 @@ angular.module('ApisModule', ["PathModule"])
             data: thumbnailsApi.data,
             events: {
                 close: function(e){
-                    eventBus.triggerEvent("toggleView", { isEnabled: false, digesting: !e.state });
-
-                    if (!e.state || !e.state.fromHistory){
-
-                        path.back();
-                    }
+                    state.back();
                 },
                 beforeSelect: function(e){
                     if (e.newItem){
                         var currentState = path.currentState;
-                        console.log("CURRENT STATE: ", currentState);
                         if (currentState){
                             currentState.itemIndex = e.newItem.id - 1;
                             path.replaceState(currentState, "Slideshow");
@@ -153,28 +147,16 @@ angular.module('ApisModule', ["PathModule"])
         data: new yox.data(),
         events: {
             click: function(e){
-                eventBus.triggerEvent("toggleView", { isEnabled: true });
+                state.setState({
+                    view: true,
+                    itemIndex: e.index
+                });
 
-                if (!viewerApi)
-                    createViewerApi(e.index);
-                else
-                    viewerApi.triggerEvent("resize");
-
-                var state = { source: currentProvider.name, view: true };
-                if (path.currentState && path.currentState.feed)
-                    state.feed = path.currentState.feed;
-
-                if (currentAlbumId)
-                    state.child = currentAlbum.id;
-
-                if (path.currentState.user)
-                    state.user = path.currentState.user;
-
-                state.itemIndex = e.index;
-
-                path.pushState(state);
-
+                /*
+                setTimeout(function(){
                 viewerApi.modules.view.selectItem(e.index);
+                }, 2);
+                */
             }
         }
     });
@@ -306,6 +288,18 @@ angular.module('ApisModule', ["PathModule"])
         }
     });
 
+    state.onFeedChange.addListener(function(e){
+        if (e.feed.hasChildren)
+            albumsApi.data.source(e.feed, e.onLoad);
+        else
+            thumbnailsApi.data.source(e.feed, e.onLoad);
+    });
+
+    state.onModeChange.addListener(function(e){
+        albumsApi.themes.wall.toggleHandleResize(e.mode === "albums");
+        thumbnailsApi.themes.wall.toggleHandleResize(e.mode === "thumbnails");
+    });
+
     albumsApi.addEventListener("openAlbum", setAlbum);
     albumsApi.addEventListener("openFeed", setFeed);
     albumsApi.addEventListener("home", function(){
@@ -337,6 +331,10 @@ angular.module('ApisModule', ["PathModule"])
         createHomeApi: createHomeApi,
         removeEventListener: eventBus.removeEventListener,
         thumbnails: thumbnailsApi,
+        createViewer: function(itemIndexToLoad){
+            if (!viewerApi)
+                createViewerApi(itemIndexToLoad);
+        },
         get viewer(){
             return viewerApi;
         },

@@ -1,21 +1,22 @@
-function ViewController($scope, apis, path){
+function ViewController($scope, apis, path, state){
     $scope.viewEnabled = false;
-    apis.addEventListener("toggleView", function(e){
-        if (e.digesting)
-            $scope.viewEnabled = e.isEnabled;
-        else
+
+    state.onViewStateChange.addListener(function(e){
+        setTimeout(function(){
             $scope.$apply(function(){
-                $scope.viewEnabled = e.isEnabled;
+                $scope.viewEnabled = e.isOpen;
+                if (e.isOpen){
+                    setTimeout(function(){
+                        if (!apis.viewer)
+                            apis.createViewer(e.itemIndex || 0);
+                        else
+                            apis.viewer.modules.view.selectItem(e.itemIndex || 0);
+
+                        apis.viewer.triggerEvent("resize");
+                    }, 100);
+                }
             });
-    });
-    path.onPushState.addListener(function(state){
-        if(!!state.view !== $scope.viewEnabled){
-            setTimeout(function(){
-                $scope.$apply(function(){
-                    $scope.viewEnabled = !!state.view;
-                });
-            }, 1);
-        }
+        });
     });
 
     $scope.commentsClosed = document.documentElement.clientWidth <= 1024;
@@ -262,4 +263,4 @@ function ViewController($scope, apis, path){
 
 }
 
-ViewController.$inject = ["$scope", "apis", "path"];
+ViewController.$inject = ["$scope", "apis", "path", "state"];
