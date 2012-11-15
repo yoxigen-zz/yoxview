@@ -338,7 +338,7 @@ yox.themes.wall = function(data, options){
     function showThumbnailImage(element){
         element.style.display = "inline";
         if (!element.src){
-            element.src = element.dataset.src;
+            element.src = element.getAttribute("data-src");
             element.removeAttribute("data-src");
         }
     }
