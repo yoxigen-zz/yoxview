@@ -163,7 +163,8 @@ angular.module('StateModule', ["PathModule"])
                     eventBus.triggerEvent("viewStateChange", { isOpen: stateView, itemIndex: state.itemIndex || 0 });
                     if (stateView)
                         eventBus.triggerEvent("modeChange", { mode: currentMode = "view" });
-
+	                else
+                        eventBus.triggerEvent("modeChange", { mode: currentMode = "thumbnails" })
                     viewOpen = stateView;
                 }
 
