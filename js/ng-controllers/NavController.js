@@ -78,6 +78,25 @@ function NavController($scope, path, apis, state){
         });
     });
 
+    state.onUserSelect.addListener(function(e){
+        setTimeout(function(){
+            $scope.$apply(function(){
+                if (e.user){
+                    $scope.user = e.user;
+                    $scope.user.feeds = e.source.getUserFeeds(e.user);
+                    $scope.currentSource = findSource(e.source.name);
+
+                    var feed =
+                    state.setState({
+                        user:e.user.id,
+                        source:e.source,
+                        feed: $scope.user.feeds[0]
+                    });
+                }
+            });
+        });
+    });
+
     $scope.selectSource = function(source){
         state.setState({ source: source.provider });
         $scope.currentNav = 1;
@@ -200,11 +219,6 @@ function NavController($scope, path, apis, state){
         if (!$scope.currentNav){
             path.pushState({ home: true });
         }
-    };
-
-    $scope.backFromUser = function(){
-        $scope.user = null;
-        path.back();
     };
 
     $scope.getDirection = yox.utils.strings.getDirection;

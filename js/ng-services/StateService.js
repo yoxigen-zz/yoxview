@@ -5,8 +5,10 @@ angular.module('StateModule', ["PathModule"])
             stateHistory = [],
             currentSource,
             currentFeed,
+            currentUser,
             viewOpen = false,
-            maxHistory = 20;
+            maxHistory = 20,
+            setLastStateOnPop;
 
         function init(){
             function setInitialState(){
@@ -16,8 +18,13 @@ angular.module('StateModule', ["PathModule"])
                     public.setState(initialState, false);
                 }
 
+
                 path.onPopState.addListener(function(pathState){
-                    if (pathState)
+                    if (setLastStateOnPop){
+                        public.setState(stateHistory.pop(), false);
+                        setLastStateOnPop = false;
+                    }
+                    else if (pathState)
                         public.setState(pathState, false);
                 });
             }
@@ -65,7 +72,7 @@ angular.module('StateModule', ["PathModule"])
                 currentFeed = feed;
             }
         }
-        function setFeed(feed, callback){
+        function feedAuthAndLoad(feed, callback){
             if (!currentSource)
                 throw new Error("Can set feed without source.");
 
@@ -89,14 +96,58 @@ angular.module('StateModule', ["PathModule"])
                 feed: state.feed && state.feed.id,
                 view: state.view,
                 itemIndex: state.itemIndex,
-                home: state.home || !state.source
+                home: state.home || !state.source,
+                user: state.user || currentUser && currentUser.id
+            }
+        }
+
+        function setFeed(feed, state){
+            if (typeof(feed) === "string"){
+                var feeds = currentUser ? currentSource.getUserFeeds(currentUser) : currentSource.feeds;
+                for(var feedIndex = 0, sourceFeed; sourceFeed = feeds[feedIndex]; feedIndex++){
+                    if (sourceFeed.id === feed){
+                        feed = sourceFeed;
+                        break;
+                    }
+                }
+            }
+
+            if (feed && Object(feed) === feed){
+                var newMode;
+                if (feed.hasChildren && currentMode !== "albums")
+                    newMode = "albums";
+                else if (!feed.hasChildren && currentMode !== "thumbnails")
+                    newMode = "thumbnails";
+
+                if (newMode){
+                    currentMode = newMode;
+                    eventBus.triggerEvent("modeChange", { mode: newMode });
+                    // When a mode changes, it's necessary to wait until the UI changes before loading data, to avoid a situation where the thumbnails are not displayed and get a width/height of 0.
+                    setTimeout(doSetFeed, 1);
+                }
+                else
+                    doSetFeed();
+
+                function doSetFeed(){
+                    feedAuthAndLoad(feed, function(){
+                        console.log("loaded feed: ", feed);
+                        if (state.view && currentMode === "thumbnails"){
+                            currentMode = "view";
+                            eventBus.triggerEvent("modeChange", { mode: "view" });
+                        }
+                        else if (!state.view && currentMode === "view"){
+                            currentMode = "thumbnails";
+                            eventBus.triggerEvent("modeChange", { mode: currentMode });
+                        }
+                    });
+                }
             }
         }
 
         var public = {
             back: function(){
                 stateHistory.pop();
-                public.setState(stateHistory.pop(), false);
+                setLastStateOnPop = true;
                 path.back();
             },
             get mode(){
@@ -112,50 +163,23 @@ angular.module('StateModule', ["PathModule"])
                     state.source = currentSource;
 
                 if (state.source){
-                    setSource(state.source, function(newSource){
-                        var feed;
-	                    if (state.user)
-		                    feed = newSource.getUserFeeds(state.user)[0];
-	                    else
-	                        feed = state.feed || newSource && newSource.feeds[0];
-
-                        if (typeof(feed) === "string"){
-                            for(var feedIndex = 0, sourceFeed; sourceFeed = currentSource.feeds[feedIndex]; feedIndex++){
-                                if (sourceFeed.id === feed){
-                                    feed = sourceFeed;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (feed && Object(feed) === feed){
-                            var newMode;
-                            if (feed.hasChildren && currentMode !== "albums")
-                                newMode = "albums";
-                            else if (!feed.hasChildren && currentMode !== "thumbnails")
-                                newMode = "thumbnails";
-
-                            function doSetFeed(){
-                                setFeed(feed, function(){
-                                    if (state.view && currentMode === "thumbnails"){
-                                        currentMode = "view";
-                                        eventBus.triggerEvent("modeChange", { mode: "view" });
-                                    }
-                                    else if (!state.view && currentMode === "view"){
-                                        currentMode = "thumbnails";
-                                        eventBus.triggerEvent("modeChange", { mode: currentMode });
-                                    }
+                    setSource(state.source, function(){
+	                    if (state.user){
+                            if (currentUser && state.user === currentUser.id && state.feed)
+                                setFeed(state.feed, state);
+                            else{
+                                currentSource.getUser(state.user, function(userData){
+                                    currentUser = userData;
+                                    eventBus.triggerEvent("userSelect", { source: currentSource, user: userData });
                                 });
                             }
-
-                            if (newMode){
-                                currentMode = newMode;
-                                eventBus.triggerEvent("modeChange", { mode: newMode });
-                                // When a mode changes, it's necessary to wait until the UI changes before loading data, to avoid a situation where the thumbnails are not displayed and get a width/height of 0.
-                                setTimeout(doSetFeed, 1);
+                        }
+	                    else{
+                            setFeed(state.feed || currentSource && currentSource.feeds[0], state);
+                            if (currentUser){
+                                currentUser = null;
+                                eventBus.triggerEvent("userSelect", { source: currentSource });
                             }
-                            else
-                                doSetFeed();
                         }
                     });
                 }
