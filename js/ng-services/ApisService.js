@@ -298,6 +298,9 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
     state.onModeChange.addListener(function(e){
         albumsApi.themes.wall.toggleHandleResize(e.mode === "albums");
         thumbnailsApi.themes.wall.toggleHandleResize(e.mode === "thumbnails");
+
+	    if (e.mode === "thumbnails")
+	    	thumbnailsApi.triggerEvent("resize");
     });
 
     albumsApi.addEventListener("openAlbum", setAlbum);

@@ -106,7 +106,8 @@ yox.themes.wall = function(data, options){
                         fastScroll();
                     else
                         loadImages();
-                }
+                },
+	            resize: updateSize
             }
         }
     };
@@ -417,20 +418,22 @@ yox.themes.wall = function(data, options){
     var handleResize = false,
         onResize;
 
+	function updateSize(){
+		self.container.classList.add(self.getThemeClass("resizing"));
+		getContainerWidth();
+		thumbs = [];
+		currentRowWidth = 0;
+		updateThumbnails(self);
+
+		setTimeout(function(){
+			self.container.classList.remove(self.getThemeClass("resizing"));
+		}, 5);
+	}
+
     this.toggleHandleResize = function(handle){
         if (handle && !handleResize){
             if (!onResize){
-                onResize = yox.utils.performance.throttle(function(){
-                    $(self.container).addClass(self.getThemeClass("resizing"));
-                    getContainerWidth();
-                    thumbs = [];
-                    currentRowWidth = 0;
-                    updateThumbnails(self);
-
-                    setTimeout(function(){
-                        $(self.container).removeClass(self.getThemeClass("resizing"));
-                    }, 5);
-                }, 250);
+                onResize = yox.utils.performance.throttle(updateSize, 250);
             }
             handleResize = true;
             window.addEventListener("resize", onResize, false);
