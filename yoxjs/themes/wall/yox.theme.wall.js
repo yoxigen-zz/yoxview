@@ -340,6 +340,7 @@ yox.themes.wall = function(data, options){
         if (!element.src){
             element.src = element.getAttribute("data-src");
             element.removeAttribute("data-src");
+
         }
     }
 
