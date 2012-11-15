@@ -37,8 +37,16 @@ angular.module('PathModule', []).factory('path', function() {
 
             return returnData;
         }
+	    else {
+	        var stateUrlMatch = url.match(/[\?#&]state=(\w+)/);
+	        if (stateUrlMatch){
+	            return {
+		            source: stateUrlMatch[1]
+	            };
+	        }
 
-        return { home: true };
+            return { home: true };
+        }
     }
 
     function pushState(state){

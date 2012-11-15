@@ -213,20 +213,6 @@ function NavController($scope, path, apis, state){
         $scope.selectSource(args.source, true);
     });
 
-
-    var stateUrlMatch = window.location.href.match(/[\?#&]state=(\w+)/);
-    if (stateUrlMatch){
-        var state = stateUrlMatch[1],
-            source;
-
-        for(var i= 0, source; source = $scope.sources[i]; i++){
-            if (source.provider.name === state) {
-                $scope.selectSource(source);
-                break;
-            }
-        }
-    }
-
     $scope.selectUser = function(user){
         $scope.user = user;
         $scope.user.feeds = yox.data.sources[user.source].getUserFeeds(user);
