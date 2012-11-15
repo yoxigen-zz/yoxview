@@ -19,13 +19,10 @@ function AppController($scope, path, state){
     $scope.selectUser = function(target){
         var userMatch = target.href && target.href.match(userUrlRegex);
         if (userMatch){
-            var state = {
-                source: userMatch[1],
-                user: userMatch[2]
-            };
-
-            path.pushState(state);
-            //$scope.$broadcast("selectUser", state);
+	        state.setState({
+		        source: userMatch[1],
+		        user: userMatch[2]
+	        });
         }
     };
 

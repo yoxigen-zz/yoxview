@@ -105,6 +105,7 @@ angular.module('StateModule', ["PathModule"])
             onFeedChange: eventBus.getEventPair("feedChange"),
             onModeChange: eventBus.getEventPair("modeChange"),
             onSourceChange: eventBus.getEventPair("sourceChange"),
+	        onUserSelect: eventBus.getEventPair("userSelect"),
             onViewStateChange: eventBus.getEventPair("viewStateChange"),
             setState: function(state, setUrl){
                 if (!state.source && state.feed)
@@ -112,7 +113,12 @@ angular.module('StateModule', ["PathModule"])
 
                 if (state.source){
                     setSource(state.source, function(newSource){
-                        var feed = state.feed || newSource && newSource.feeds[0];
+                        var feed;
+	                    if (state.user)
+		                    feed = newSource.getUserFeeds(state.user)[0];
+	                    else
+	                        feed = state.feed || newSource && newSource.feeds[0];
+
                         if (typeof(feed) === "string"){
                             for(var feedIndex = 0, sourceFeed; sourceFeed = currentSource.feeds[feedIndex]; feedIndex++){
                                 if (sourceFeed.id === feed){
