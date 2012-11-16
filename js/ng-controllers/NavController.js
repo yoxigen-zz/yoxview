@@ -2,7 +2,13 @@ function NavController($scope, path, apis, state){
     var availableSources = ["facebook", "instagram", "picasa"];
 
     $scope.sources = getSources();
-    $scope.currentNav = 0;
+    var modeNavs = {
+        home: 0,
+        thumbnails: 1,
+        albums: 2
+    };
+
+    $scope.currentNav = modeNavs.home;
     getSourceUsers();
 
     function getSources(){
@@ -86,24 +92,36 @@ function NavController($scope, path, apis, state){
                     $scope.user.feeds = e.source.getUserFeeds(e.user);
                     $scope.currentSource = findSource(e.source.name);
 
-                    var feed =
-                    state.setState({
+                    state.replaceState({
                         user:e.user.id,
                         source:e.source,
                         feed: $scope.user.feeds[0]
-                    });
+                    }, { replace: true });
                 }
+                else
+                    $scope.user = null;
             });
         });
     });
 
+    state.onModeChange.addListener(function(e){
+        var nav = modeNavs[e.mode];
+        if (nav !== undefined){
+            setTimeout(function(){
+                $scope.$apply(function(){
+                    $scope.currentNav = nav;
+                });
+            })
+        }
+    });
+
     $scope.selectSource = function(source){
-        state.setState({ source: source.provider });
+        state.pushState({ source: source.provider });
         $scope.currentNav = 1;
     };
 
     $scope.selectFeed = function(feed){
-        state.setState({
+        state.pushState({
             feed: feed
         });
         /*
@@ -213,12 +231,7 @@ function NavController($scope, path, apis, state){
     });
 
     $scope.back = function(){
-        if ($scope.currentNav > 0)
-            $scope.currentNav--;
-
-        if (!$scope.currentNav){
-            path.pushState({ home: true });
-        }
+        state.back();
     };
 
     $scope.getDirection = yox.utils.strings.getDirection;
@@ -226,87 +239,6 @@ function NavController($scope, path, apis, state){
     $scope.$on("login", function(e, args){
         $scope.selectSource(args.source, true);
     });
-
-    $scope.selectUser = function(user){
-        $scope.user = user;
-        $scope.user.feeds = yox.data.sources[user.source].getUserFeeds(user);
-        $scope.currentSource = findSource(user.source);
-
-        var feed = $scope.user.feeds[0];
-        $scope.selectFeed(feed, { source: user.source, user: user.id, feed: feed.id });
-    };
-
-    /*
-    function getUserFromUserId(source, userId, callback){
-        yox.data.sources[source].getUser(userId, callback);
-    }
-
-
-    function getUserFromState(state){
-        if (state && state.user && state.source && (!$scope.user || state.user !== $scope.user.id)){
-            getUserFromUserId(state.source, state.user, function(userData){
-                setTimeout(function(){
-                    $scope.$apply(function(){
-                        $scope.selectUser(userData);
-                    });
-                }, 0);
-            });
-        }
-    }
-
-    $scope.$on("selectUser", function(e, state){
-        getUserFromState(state);
-    });
-*/
-    /*
-    $scope.$on("state", function(e, state){
-        if (state && state.user){
-            getUserFromState(state);
-        }
-        else if (state && state.source){
-            var source = findSource(state.source);
-
-            if (apis.viewer){
-                if (state.view && !apis.viewer.modules.view.isOpen()){
-
-                    //function onLoad(){
-                        //if (state.itemIndex){
-                          //  apis.viewer.modules.view.selectItem(state.itemIndex);
-                        //}
-                        //apis.openViewer();
-                        //apis.thumbnails.data.removeEventListener("loadSources", onLoad);
-                    //}
-                    //apis.thumbnails.data.addEventListener("loadSources", onLoad);
-
-                }
-            }
-            $scope.selectSource(source, true, state);
-        }
-        else{
-            setTimeout(function(){
-                $scope.$apply(function(){
-                    $scope.currentNav = 0;
-                });
-            })
-        }
-
-        if ($scope.user && (!state || !state.user)){
-            setTimeout(function(){
-                $scope.$apply(function(){
-                    $scope.user = null;
-                });
-            });
-
-        }
-    });
-
-    path.onPushState.addListener(function(state){
-        if (state.user){
-            getUserFromState(state);
-        }
-    });
-*/
-
 }
 
 NavController.$inject = ["$scope", "path", "apis", "state"];

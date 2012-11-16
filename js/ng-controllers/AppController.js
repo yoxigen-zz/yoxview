@@ -1,4 +1,4 @@
-function AppController($scope, path, state){
+function AppController($scope, state){
     var views = ["home", "sources", "albums", "thumbnails"],
         userUrlRegex = /\?\/(\w+)\/user\/([^\/\?$]+)/;
 
@@ -19,7 +19,7 @@ function AppController($scope, path, state){
     $scope.selectUser = function(target){
         var userMatch = target.href && target.href.match(userUrlRegex);
         if (userMatch){
-	        state.setState({
+	        state.pushState({
 		        source: userMatch[1],
 		        user: userMatch[2]
 	        });
@@ -33,6 +33,10 @@ function AppController($scope, path, state){
             });
         });
     });
+
+    $scope.home = function(){
+        state.pushState({ home: true });
+    };
 }
 
-AppController.$inject = ["$scope", "path", "state"];
+AppController.$inject = ["$scope", "state"];

@@ -15,17 +15,17 @@ angular.module('StateModule', ["PathModule"])
                 var initialState = path.getFeedDataFromUrl();
 
                 if (initialState){
-                    public.setState(initialState, false);
+                    public.pushState(initialState, false);
                 }
 
 
                 path.onPopState.addListener(function(pathState){
-                    if (setLastStateOnPop){
-                        public.setState(stateHistory.pop(), false);
+                    if (setLastStateOnPop && stateHistory.length){
+                        public.pushState(stateHistory.pop(), false);
                         setLastStateOnPop = false;
                     }
                     else if (pathState)
-                        public.setState(pathState, false);
+                        public.pushState(pathState, false);
                 });
             }
             function onInitialState(){
@@ -40,6 +40,51 @@ angular.module('StateModule', ["PathModule"])
             }
             else
                 window.addEventListener("popstate", onInitialState, false);
+        }
+
+        function getBaseState(state){
+            var baseState = {};
+            baseState.user = state.user;
+            if (state.source)
+                baseState.source = Object(state.source) === state.source ? state.source.name : state.source;
+
+            if (state.feed)
+                baseState.feed = Object(state.feed) === state.feed ? state.feed.id : state.feed;
+
+            if (state.view)
+                baseState.view = state.view;
+
+            if (state.itemIndex !== undefined)
+                baseState = state.itemIndex;
+
+            if (state.home)
+                baseState.home = state.home;
+
+            return baseState;
+        }
+
+        function statesAreEqual(state1, state2){
+            var baseState1 = getBaseState(state1), baseState2 = getBaseState(state2);
+
+            if (baseState1.source !== baseState2.source)
+                return false;
+
+            if (baseState1.feed !== baseState2.feed)
+                return false;
+
+            if (baseState1.view !== baseState2.view)
+                return false;
+
+            if (baseState1.user !== baseState2.user)
+                return false;
+
+            if (baseState1.itemIndex !== baseState2.itemIndex)
+                return false;
+
+            if (baseState1.home !== baseState2.home)
+                return false;
+
+            return true;
         }
 
         function getLastHistory(property){
@@ -130,7 +175,6 @@ angular.module('StateModule', ["PathModule"])
 
                 function doSetFeed(){
                     feedAuthAndLoad(feed, function(){
-                        console.log("loaded feed: ", feed);
                         if (state.view && currentMode === "thumbnails"){
                             currentMode = "view";
                             eventBus.triggerEvent("modeChange", { mode: "view" });
@@ -144,11 +188,78 @@ angular.module('StateModule', ["PathModule"])
             }
         }
 
+        function cancelCurrentUser(){
+            if (currentUser){
+                currentUser = null;
+                eventBus.triggerEvent("userSelect", { source: currentSource });
+            }
+        }
+
+        function setState(state){
+            if (stateHistory.length && statesAreEqual(stateHistory[stateHistory.length - 1], state))
+                return false;
+
+            if (state.home){
+                if (currentMode !== "home")
+                    eventBus.triggerEvent("modeChange", { mode: currentMode = "home" });
+
+                cancelCurrentUser();
+            }
+            else {
+                if (!state.source && state.feed)
+                    state.source = currentSource;
+
+                if (state.source){
+                    setSource(state.source, function(){
+                        if (state.user){
+                            if (currentUser && state.user === currentUser.id && state.feed)
+                                setFeed(state.feed, state);
+                            else{
+                                currentSource.getUser(state.user, function(userData){
+                                    currentUser = userData;
+                                    eventBus.triggerEvent("userSelect", { source: currentSource, user: userData });
+
+                                    if (state.feed)
+                                        setFeed(state.feed, state);
+                                });
+                            }
+                        }
+                        else{
+                            setFeed(state.feed || currentSource && currentSource.feeds[0], state);
+                            cancelCurrentUser();
+                        }
+                    });
+                }
+                else if (currentSource) {
+                    state.source = currentSource;
+                    state.feed = getLastHistory("feed");
+                }
+            }
+
+            var stateView = !!state.view;
+            if (stateView !== viewOpen){
+                eventBus.triggerEvent("viewStateChange", { isOpen: stateView, itemIndex: state.itemIndex || 0 });
+                eventBus.triggerEvent("modeChange", { mode: currentMode = (stateView ? "view" : "thumbnails") });
+                viewOpen = stateView;
+            }
+
+            return state;
+        }
+
         var public = {
             back: function(){
-                stateHistory.pop();
-                setLastStateOnPop = true;
-                path.back();
+                if (stateHistory.length > 1){
+                    stateHistory.pop();
+                    setLastStateOnPop = true;
+                    path.back();
+                }
+                else{
+                    path.top();
+                    if (currentMode !== "home")
+                        eventBus.triggerEvent("modeChange", { mode: "home" });
+
+                    cancelCurrentUser();
+                }
             },
             get mode(){
                 return currentMode;
@@ -158,50 +269,29 @@ angular.module('StateModule', ["PathModule"])
             onSourceChange: eventBus.getEventPair("sourceChange"),
 	        onUserSelect: eventBus.getEventPair("userSelect"),
             onViewStateChange: eventBus.getEventPair("viewStateChange"),
-            setState: function(state, setUrl){
-                if (!state.source && state.feed)
-                    state.source = currentSource;
+            pushState: function(state, setUrl){
+                state = setState(state);
 
-                if (state.source){
-                    setSource(state.source, function(){
-	                    if (state.user){
-                            if (currentUser && state.user === currentUser.id && state.feed)
-                                setFeed(state.feed, state);
-                            else{
-                                currentSource.getUser(state.user, function(userData){
-                                    currentUser = userData;
-                                    eventBus.triggerEvent("userSelect", { source: currentSource, user: userData });
-                                });
-                            }
-                        }
-	                    else{
-                            setFeed(state.feed || currentSource && currentSource.feeds[0], state);
-                            if (currentUser){
-                                currentUser = null;
-                                eventBus.triggerEvent("userSelect", { source: currentSource });
-                            }
-                        }
-                    });
+                if (state){
+                    if (setUrl !== false)
+                        path.pushState(getPathState(state));
+
+                    if (stateHistory.length === maxHistory)
+                        stateHistory.shift();
+
+                    stateHistory.push(state);
                 }
-                else if (currentSource) {
-                    state.source = currentSource;
-                    state.feed = getLastHistory("feed");
+            },
+            replaceState: function(state){
+                state = setState(state);
+
+                if (state){
+                    path.replaceState(getPathState(state));
+                    if (stateHistory.length)
+                        stateHistory[stateHistory.length - 1] = state;
+                    else
+                        stateHistory.push(state);
                 }
-
-                var stateView = !!state.view;
-                if (stateView !== viewOpen){
-                    eventBus.triggerEvent("viewStateChange", { isOpen: stateView, itemIndex: state.itemIndex || 0 });
-	                eventBus.triggerEvent("modeChange", { mode: currentMode = (stateView ? "view" : "thumbnails") });
-                    viewOpen = stateView;
-                }
-
-                if (setUrl !== false)
-                    path.pushState(getPathState(state));
-
-                if (stateHistory.length === maxHistory)
-                    stateHistory.shift();
-
-                stateHistory.push(state);
             }
         };
 

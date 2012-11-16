@@ -49,7 +49,7 @@ angular.module('PathModule', []).factory('path', function() {
         }
     }
 
-    function pushState(state){
+    function getUrlFromState(state){
         var url = [];
         if (state.source){
             url.push(state.source);
@@ -68,8 +68,12 @@ angular.module('PathModule', []).factory('path', function() {
                 url.push("view");
         }
 
+        return "?/" + url.join("/");
+    }
+
+    function pushState(state){
         eventBus.triggerEvent("pushState", state);
-        window.history.pushState(state, state.feed || state.source || "home", "?/" + url.join("/"));
+        window.history.pushState(state, state.feed || state.source || "home", getUrlFromState(state));
     }
 
     function onPopState(e){
@@ -85,7 +89,7 @@ angular.module('PathModule', []).factory('path', function() {
             return getFeedDataFromUrl(url || window.location.href);
         },
         replaceState: function(state, title){
-            window.history.replaceState(state, title);
+            window.history.replaceState(state, title, getUrlFromState(state));
         },
         pushState: window.history && window.history.pushState ? yox.utils.performance.throttle(pushState, 50) : function(){},
         onPopState: {
@@ -109,6 +113,9 @@ angular.module('PathModule', []).factory('path', function() {
             removeListener: function(listener){
                 eventBus.removeEventListener("pushState", listener);
             }
+        },
+        top: function(){
+            pushState({});
         }
     };
 

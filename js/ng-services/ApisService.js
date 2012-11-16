@@ -25,6 +25,7 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
                     renderControls: false,
                     showThumbnails: false,
                     showInfo: false,
+                    firstItem: itemIndexToShow,
                     modules: {
                         view: {
                             loop: false,
@@ -147,16 +148,12 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
         data: new yox.data(),
         events: {
             click: function(e){
-                state.setState({
-                    view: true,
-                    itemIndex: e.index
-                });
-
-                /*
-                setTimeout(function(){
-                viewerApi.modules.view.selectItem(e.index);
-                }, 2);
-                */
+                if (e.originalEvent.target.className === "yox-theme-wall-info"){
+                    state.pushState({
+                        view: true,
+                        itemIndex: e.index
+                    });
+                }
             }
         }
     });
@@ -212,9 +209,10 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
             }
 
             if (item.author.name){
-                var authorName = document.createElement("span");
-                authorName.className = "yox-theme-wall-info-author";
+                var authorName = document.createElement("a");
+                authorName.className = "yox-theme-wall-info-author userLink";
                 authorName.textContent = item.author.name || item.author.username;
+                authorName.setAttribute("href", ["?", item.source.sourceType.name, "user", item.author.id].join("/"));
                 meta.appendChild(authorName);
             }
         }
@@ -271,23 +269,6 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
         }
     }
 
-    path.onPopState.addListener(function(state){
-        if (!viewerApi)
-            createViewerApi((state && state.itemIndex) || 0);
-
-        var isViewerOpen = viewerApi.modules.view.isOpen(),
-            stateView = state && state.view;
-
-        if (isViewerOpen !== !!stateView){
-            if (stateView){
-                eventBus.triggerEvent("toggleView", { isEnabled: true });
-                //viewerApi.modules.view.selectItem(state.itemIndex || 0);
-            }
-            else
-                viewerApi.modules.view.close({ fromHistory: true });
-        }
-    });
-
     state.onFeedChange.addListener(function(e){
         if (e.feed.hasChildren)
             albumsApi.data.source(e.feed, e.onLoad);
@@ -343,9 +324,6 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
         },
         get viewer(){
             return viewerApi;
-        },
-        openViewer: function(){
-            eventBus.triggerEvent("toggleView", { isEnabled: true });
         }
     };
 });

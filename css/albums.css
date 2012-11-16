@@ -282,7 +282,7 @@ body > section{ display: none; }
 
 #viewer{ display: none }
 
-#thumbnails .yox-theme-wall-thumbnails a{
+#thumbnails .yox-theme-wall-thumbnail{
     opacity: 1;
     -webkit-transition: none;
 }
@@ -325,12 +325,11 @@ body > section{ display: none; }
     -o-transition: opacity 200ms ease-out;
     transition: opacity 200ms ease-out;
 }
-    .yox-theme-wall-thumbnails a:hover .yox-theme-wall-info{
+    .yox-theme-wall-thumbnail:hover .yox-theme-wall-info{
         opacity: 1;
     }
 
     .yox-theme-wall-info a{
-        color: #F68E56;
         text-decoration: none;
         background: none;
         opacity: 1;

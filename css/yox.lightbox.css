@@ -52,8 +52,9 @@
 .yox-theme-wall-thumbnails{
     min-height: 49%;
 }
-    .yox-theme-wall a{ -webkit-user-select: none; }
-    .yox-theme-wall-thumbnails a{
+    .yox-theme-wall-thumbnail{
+        cursor: pointer;
+        -webkit-user-select: none;
         display: block;
         float: left;
         background: #333;
@@ -66,19 +67,24 @@
         position: relative;
         z-index: 1;
     }
-    .yox-theme-wall-resizing .yox-theme-wall-thumbnails a{
+    .yox-theme-wall-thumbnail-link{
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .yox-theme-wall-resizing .yox-theme-wall-thumbnail{
         -webkit-transition: none;
         -moz-transition: none;
         -o-transition: none;
         -ms-transition: none;
     }
     @media only screen and (max-device-width:500px){
-        .yox-theme-wall-thumbnails a{
+        .yox-theme-wall-thumbnail{
             opacity: 1;
         }
     }
     .yox-theme-switcher-open .yox-theme-wall-thumbnails a{ opacity: .2; background: Transparent; }
-    .yox-theme-wall-thumbnails a:hover{
+    .yox-theme-wall-thumbnail:hover{
         opacity: 1;
         z-index: 99;
     }

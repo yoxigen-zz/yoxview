@@ -47,6 +47,7 @@ header{
         background: -ms-linear-gradient(left, #212121, #2A2A2A);
         background: -o-linear-gradient(left, #212121, #2A2A2A);
         background: linear-gradient(left, #212121, #2A2A2A);
+        cursor: pointer;
     }
     #logo{
         width: 133px;
@@ -162,7 +163,7 @@ header h1 span{
     display: none;
 }
 
-.user_link{ color: #a3d39c }
+.userLink{ color: #a3d39c }
 
 .sourceIcon{
     width: 25px;

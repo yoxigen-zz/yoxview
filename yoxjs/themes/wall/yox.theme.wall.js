@@ -1,4 +1,7 @@
 yox.themes.wall = function(data, options){
+    this.name = "wall";
+    this.modules = {};
+
     var elements = {},
         containerWidth,
         self = this,
@@ -14,13 +17,18 @@ yox.themes.wall = function(data, options){
         rowHeights = [],
         rows = [],
         scrollHeight,
-        visibleHeight;
+        visibleHeight,
+        classes = {
+            thumbnail: self.getThemeClass("thumbnail"),
+            thumbnailLink: self.getThemeClass("thumbnail-link"),
+            thumbnailInfo: self.getThemeClass("thumbnailInfo"),
+            thumbnailInfoCount: self.getThemeClass("thumbnailInfo_count"),
+            loading: self.getThemeClass("loading"),
+            resizing: self.getThemeClass("resizing"),
+            loadedAll: self.getThemeClass("loadedAll")
+        };
 
-    this.name = "wall";
-    this.modules = {};
-
-    var loadingClass = this.getThemeClass("loading"),
-        thumbs = [],
+    var thumbs = [],
         currentRowWidth = 0,
         throttledScrollIntoView = yox.utils.performance.throttle(function(element){
             yox.utils.dom.scrollIntoView(element, self.container, options.scrollAnimationDuration, options.scrollOffset);
@@ -29,21 +37,25 @@ yox.themes.wall = function(data, options){
     this.config = {
         thumbnails: {
             createThumbnail: function(itemIndex, item, totalItems){
-                var thumbnail = document.createElement("a"),
+                var thumbnail = document.createElement("div"),
+                    thumbnailLink = document.createElement("a"),
                     thumbnailImg = item.thumbnail.src ? document.createElement("img") : undefined,
                     dfd;
+
+                thumbnail.className = classes.thumbnail;
+                thumbnailLink.className = classes.thumbnailLink;
+                thumbnail.image = thumbnailImg;
 
                 if (thumbnailImg){
                     thumbnailImg.addEventListener("load", onImageLoad, false);
                     thumbnailImg.setAttribute("data-src", item.thumbnail.src);
+                    thumbnailLink.appendChild(thumbnailImg);
                 }
 
                 thumbnail.style.display = "none";
 
-                if (thumbnailImg)
-                    thumbnail.appendChild(thumbnailImg);
-
-                thumbnail.setAttribute("href", this.options.createThumbnailUrl ? this.options.createThumbnailUrl(item) : item.link || item.url);
+                thumbnail.appendChild(thumbnailLink);
+                thumbnailLink.setAttribute("href", this.options.createThumbnailUrl ? this.options.createThumbnailUrl(item) : item.link || item.url);
 
                 var thumbnailInfo;
                 if (options.createThumbnailInfoFunc){
@@ -53,14 +65,14 @@ yox.themes.wall = function(data, options){
                 }
                 else if (options.createThumbnailInfo && (item.title || item.data && item.data.album)){
                     thumbnailInfo = document.createElement("span");
-                    thumbnailInfo.className = self.getThemeClass("thumbnailInfo");
+                    thumbnailInfo.className = classes.thumbnailInfo;
                     thumbnailInfo.innerHTML = item.title;
                     if (yox.utils.strings.isRtl(item.title))
                         thumbnailInfo.dir = "rtl";
 
                     if (item.data && item.data.album && item.data.album.imageCount !== undefined){
                         var imageCount = document.createElement("span");
-                        imageCount.className = self.getThemeClass("thumbnailInfo_count");
+                        imageCount.className = classes.thumbnailInfoCount;
                         imageCount.innerHTML = item.data.album.imageCount;
                         thumbnailInfo.appendChild(imageCount);
                     }
@@ -170,7 +182,7 @@ yox.themes.wall = function(data, options){
                 if (showThumbnail)
                     thumb.style.removeProperty("display");
 
-                rowElements.push(thumb.firstElementChild);
+                rowElements.push(thumb.image);
             }
 
             // Due to the rounding in image widths, a small fix is required to arrange the thumbnails pixel-perfectly:
@@ -253,7 +265,7 @@ yox.themes.wall = function(data, options){
             }
         }
         isLoading = false;
-        $(self.container).removeClass(loadingClass);
+        $(self.container).removeClass(classes.loading);
     }
 
     function onImageLoad(){
@@ -276,7 +288,7 @@ yox.themes.wall = function(data, options){
 
     function loadItems(){
         isLoading = true;
-        $(self.container).addClass(loadingClass);
+        $(self.container).addClass(classes.loading);
         loadMoreItems();
     }
 
@@ -307,7 +319,7 @@ yox.themes.wall = function(data, options){
                 elements.scrollElement.addEventListener("scroll", onScroll, false);
 
             data.addEventListener("loadSources", setDataSource);
-            $(self.container).removeClass(self.getThemeClass("loadedAll"));
+            $(self.container).removeClass(classes.loadedAll);
         }
     });
     data.addEventListener("loadedLastPage", function(){
@@ -419,14 +431,14 @@ yox.themes.wall = function(data, options){
         onResize;
 
 	function updateSize(){
-		self.container.classList.add(self.getThemeClass("resizing"));
+		self.container.classList.add(classes.resizing);
 		getContainerWidth();
 		thumbs = [];
 		currentRowWidth = 0;
 		updateThumbnails(self);
 
 		setTimeout(function(){
-			self.container.classList.remove(self.getThemeClass("resizing"));
+			self.container.classList.remove(classes.resizing);
 		}, 5);
 	}
 
@@ -465,7 +477,7 @@ yox.themes.wall = function(data, options){
                 "margin-bottom: " + options.borderWidth + "px"
             ];
 
-        styleEl.innerHTML = " ." + containerClass + "-thumbnails a[data-yoxthumbindex]{ " + thumbnailStyle.join("; ") + " }";
+        styleEl.innerHTML = " ." + containerClass + "-thumbnail{ " + thumbnailStyle.join("; ") + " }";
         document.getElementsByTagName("head")[0].appendChild(styleEl);
 
         if (options.handleResize)
@@ -497,7 +509,7 @@ yox.themes.wall = function(data, options){
                 elements.scrollElement.removeEventListener("scroll", onScroll, false);
             data.removeEventListener("loadSources", setDataSource);
             loadedAllItems = true;
-            $(container).addClass(self.getThemeClass("loadedAll"));
+            $(container).addClass(classes.loadedAll);
         });
     };
 }

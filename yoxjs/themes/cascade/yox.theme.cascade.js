@@ -128,7 +128,7 @@ yox.themes.cascade.defaults = {
         avatar: "avatar",
         commentTexts: "yox-theme-cascade-comment_texts",
         timestamp: "yox-theme-cascade-comment_timestamp",
-        userLink: "yox-theme-cascade-comment_user_link",
+        userLink: "yox-theme-cascade-comment_userLink",
         comments: "yox-theme-cascade-comments",
         commentText: "yox-theme-cascade-comment_text"
     },

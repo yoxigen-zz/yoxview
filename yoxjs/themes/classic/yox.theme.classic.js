@@ -55,7 +55,7 @@ yox.themes.classic = function(data, options){
                     }
                 },
                 "init.view": function(){
-                    this.selectItem(this.options.firstItem || 0);
+                    this.selectItem(options.firstItem || 0);
                     if (options.renderInfo)
                         elements.infoPanel.style.opacity = "1";
                 },

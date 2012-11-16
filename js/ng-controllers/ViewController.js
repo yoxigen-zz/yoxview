@@ -13,7 +13,7 @@ function ViewController($scope, apis, path, state){
                             apis.viewer.modules.view.selectItem(e.itemIndex || 0);
 
                         apis.viewer.triggerEvent("resize");
-                    }, 100);
+                    }, 10);
                 }
             });
         });
@@ -193,7 +193,7 @@ function ViewController($scope, apis, path, state){
             }
             else if (/^@/.test(result)){
                 href = href + "user/" + result.slice(1);
-                className += " user_link";
+                className += " userLink";
             }
 
             return "<a class='" + className + "' href=\"" + href + "\"" + (isExternalLink ? " target='_blank'" : "") + ">" + result + "</a>"

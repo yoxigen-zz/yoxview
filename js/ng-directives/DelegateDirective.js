@@ -9,6 +9,7 @@ angular.module("DelegateModule", []).directive("delegate", function(){
 
             $(element[0]).on(delegateParts[0], delegateParts[1], function(e){
                 e.preventDefault();
+                e.stopPropagation();
                 $scope[handler].call(this, this, e);
             });
         }

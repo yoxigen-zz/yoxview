@@ -18,9 +18,9 @@
     <script src="js/external/angular-1.0.1.min.js"></script>
     <script src="js/ga.js"></script>
 </head>
-<body ng-controller="AppController" delegate="click:.innerLink:selectUser">
+<body ng-controller="AppController" delegate="click:.userLink:selectUser">
     <header ng-cloak>
-        <h1 id="appName">
+        <h1 id="appName" ng-click="home()">
             <img id="logo" src="img/logo.png" />
         </h1>
         <div id="search" ng-class="{open:searchOpen}">
@@ -50,7 +50,7 @@
                 </nav>
                 <nav class="thumbnailsNav thumbnailsNav_2" ng-cloak>
                     <div class="thumbnailsNav_scroll">
-                        <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
+                        <a class="backNav" ng-click="home()"><span class="backIcon"></span>Back</a>
                         <div class="thumbnailsNav_sourceUser" ng-show="currentSource.currentUser">
                             <img class="sourceAvatar" ng-src="{{currentSource.currentUser.avatar}}" ng-show="currentSource.currentUser.avatar" />
                             <span class="sourceName">{{currentSource.provider.sourceName}}</span>
@@ -77,8 +77,7 @@
                         <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
                         <input type="text" ng-model="usersFilter" placeholder="Search contacts" />
                         <a ng-repeat="user in users | orderBy:'name' | filter:usersFilter"
-                           ng-click="selectUser(user)"
-                           class="innerLink user_link"
+                           class="innerLink userLink"
                            ng-class="{selected:user.selected}"
                            href="?/{{currentSource.provider.name}}/user/{{user.id}}"
                            dir="{{getDirection(user.name)}}"
@@ -119,15 +118,15 @@
         <div id="viewer_left">
             <div id="viewer_view"></div>
             <div id="viewer_info">
-                <a id="viewer_info_author" class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}" ng-show="commentsClosed">
+                <a id="viewer_info_author" class="innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}" ng-show="commentsClosed">
                     <img class="avatar" ng-src="{{currentItem.author.avatar}}" title="{{currentItem.author.username || currentItem.author.name}}" ng-show="currentItem.author.avatar" />
-                    <span class="user_link">{{currentItem.author.name}}</span>
+                    <span>{{currentItem.author.name}}</span>
                 </a>
                 <p id="viewer_info_caption" ng-bind-html-unsafe="formatText(currentItem.title)" dir="{{getDirection(currentItem.title)}}"></p>
                 <ul id="viewer_info_people" ng-show="currentItem.people">
                     <li>With </li>
                     <li ng-repeat="person in currentItem.people">
-                        <a class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{person.id}}">{{person.name}}</a>{{getListItemSeparator($index, currentItem.people.length);}}
+                        <a class="innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{person.id}}">{{person.name}}</a>{{getListItemSeparator($index, currentItem.people.length);}}
                     </li>
                 </ul>
             </div>
@@ -142,9 +141,9 @@
             </div>
             <div id="viewer_comments_contents">
                 <section id="comments_user" class="comments_section_contents">
-                    <a id="comments_avatar" class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}">
+                    <a id="comments_avatar" class="innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{currentItem.author.id}}">
                         <img ng-show="currentItem.author.avatar" ng-src="{{currentItem.author.avatar}}" alt title="{{currentItem.author.username || currentItem.author.name}}" />
-                        <span class="user_link">{{currentItem.author.username || currentItem.author.name}}</span>
+                        <span>{{currentItem.author.username || currentItem.author.name}}</span>
                     </a>
                     <span class="timestamp">{{formatDate(currentItem.time)}}</span>
                 </section>
@@ -175,12 +174,12 @@
 
                         </li>
                         <li ng-repeat="comment in currentItem.social.comments | orderBy:time:true" class="comment">
-                            <a class="comment_avatar innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                            <a class="comment_avatar innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
                                 <img class="avatar" ng-src="{{comment.user.avatar}}" title="{{comment.user.username || comment.user.name}}" />
                             </a>
                             <div class="comment_texts">
                                 <span class="timestamp">{{formatDate(comment.time)}}</span>
-                                <a class="innerLink user_link" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
+                                <a class="innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
                                     {{comment.user.username || comment.user.name}}
                                 </a>
                                 <p class="commentText" dir="{{getDirection(comment.text)}}" ng-bind-html-unsafe="formatText(comment.text)"></p>
@@ -203,7 +202,7 @@
                         </a>
                     </li>
                     <li ng-repeat="contact in likes">
-                        <a class="innerLink user_link like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
+                        <a class="innerLink userLink like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
                             <img class="avatar" ng-src="{{contact.avatar}}" />
                             {{contact.username || contact.name}}
                         </a>
