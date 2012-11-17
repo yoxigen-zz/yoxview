@@ -45,8 +45,8 @@ yox.themes.classic = function(data, options){
             margin: 0,
             showThumbnailsBeforeLoad: true,
             events: {
-                cacheStart: function(e, item){ elements.loader.style.display = "inline" },
-                cacheEnd: function(e, item){ elements.loader.style.display = "none" },
+                cacheStart: function(e, item){ elements.loader.style.display = "inline"; },
+                cacheEnd: function(e, item){ elements.loader.style.display = "none"; },
                 "click.thumbnails": function(e){ this.selectItem(e.index, "scroll"); },
                 "end.view": function(){
                     if (!data.isLoading){

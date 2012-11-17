@@ -1,22 +1,47 @@
 function ViewController($scope, apis, path, state){
     $scope.viewEnabled = false;
 
+    var loadingFeed = false,
+        itemIndexToLoadOnFeedLoad;
+
+    function openView(itemIndex){
+        if (!apis.viewer)
+            apis.createViewer(itemIndex || 0);
+        else
+            apis.viewer.modules.view.selectItem(itemIndex || 0);
+
+        apis.viewer.triggerEvent("resize");
+    }
+
     state.onViewStateChange.addListener(function(e){
         setTimeout(function(){
             $scope.$apply(function(){
                 $scope.viewEnabled = e.isOpen;
                 if (e.isOpen){
-                    setTimeout(function(){
-                        if (!apis.viewer)
-                            apis.createViewer(e.itemIndex || 0);
-                        else
-                            apis.viewer.modules.view.selectItem(e.itemIndex || 0);
-
-                        apis.viewer.triggerEvent("resize");
-                    }, 10);
+                    if (loadingFeed)
+                        itemIndexToLoadOnFeedLoad = e.itemIndex || 0;
+                    else {
+                        setTimeout(function(){
+                            openView(e.itemIndex);
+                        }, 10);
+                    };
                 }
             });
         });
+    });
+
+    function onLoadData(){
+        loadingFeed = false;
+        if (!isNaN(itemIndexToLoadOnFeedLoad)){
+            openView(itemIndexToLoadOnFeedLoad);
+            itemIndexToLoadOnFeedLoad = null;
+        }
+        apis.thumbnails.data.removeEventListener("loadSources", onLoadData);
+    }
+
+    state.onFeedChange.addListener(function(e){
+        loadingFeed = true;
+        apis.thumbnails.data.addEventListener("loadSources", onLoadData);
     });
 
     $scope.commentsClosed = document.documentElement.clientWidth <= 1024;
