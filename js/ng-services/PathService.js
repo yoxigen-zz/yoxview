@@ -21,14 +21,11 @@ angular.module('PathModule', []).factory('path', function() {
                     if (feedParts.length > position){
                         returnData.feed = feedParts[position++];
 
-                        if (feedParts.length > position){
-                            if (feedParts.length === (position + 1) && feedParts[position] === "view")
-                                returnData.view = true;
-                            else{
-                                returnData.child = feedParts[position++];
+                        if (feedParts.length > position && feedParts[position++] === "view"){
+                            returnData.view = true;
 
-                                if (feedParts.length === (position + 1) && feedParts[position] === "view")
-                                    returnData.view = true;
+                            if (feedParts.length > position){
+                                returnData.itemIndex = feedParts[position];
                             }
                         }
                     }
@@ -41,7 +38,8 @@ angular.module('PathModule', []).factory('path', function() {
 	        var stateUrlMatch = url.match(/[\?#&]state=(\w+)/);
 	        if (stateUrlMatch){
 	            return {
-		            source: stateUrlMatch[1]
+		            source: stateUrlMatch[1],
+                    isOauthResponse: true
 	            };
 	        }
 
@@ -64,8 +62,12 @@ angular.module('PathModule', []).factory('path', function() {
                     url.push(state.child);
             }
 
-            if (state.view)
+            if (state.view){
                 url.push("view");
+
+                if (state.itemIndex)
+                    url.push(state.itemIndex);
+            }
         }
 
         return "?/" + url.join("/");

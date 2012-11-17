@@ -15,17 +15,34 @@ angular.module('StateModule', ["PathModule"])
                 var initialState = path.getFeedDataFromUrl();
 
                 if (initialState){
-                    public.pushState(initialState, false);
+                    if (initialState.isOauthResponse)
+                        public.replaceState(initialState);
+                    else
+                        public.pushState(initialState, false);
                 }
 
 
                 path.onPopState.addListener(function(pathState){
+                    if (!pathState.user)
+                        cancelCurrentUser();
+
                     if (setLastStateOnPop && stateHistory.length){
                         public.pushState(stateHistory.pop(), false);
                         setLastStateOnPop = false;
                     }
-                    else if (pathState)
+                    else if (pathState){
                         public.pushState(pathState, false);
+                    }
+                    else if (currentMode !== "home"){
+                        if (currentMode !== "home")
+                            eventBus.triggerEvent("modeChange", { mode: currentMode = "home" });
+
+                        stateHistory.length && stateHistory.pop();
+                        cancelCurrentUser();
+                        currentFeed = currentSource = null;
+                        viewOpen = false;
+                    }
+
                 });
             }
             function onInitialState(){
@@ -171,6 +188,9 @@ angular.module('StateModule', ["PathModule"])
                     doSetFeed();
 
                 function doSetFeed(){
+                    if (currentFeed && state.source.name === currentSource.name && feed.id === currentFeed.id && (!currentUser || currentUser.id !== state.user))
+                        return;
+
                     feedAuthAndLoad(feed, function(){
                         if (state.view && currentMode === "thumbnails"){
                             currentMode = "view";
@@ -203,8 +223,14 @@ angular.module('StateModule', ["PathModule"])
                 cancelCurrentUser();
             }
             else {
-                if (!state.source && state.feed)
+                if (!state.source && (state.feed || state.view))
                     state.source = currentSource;
+
+                if (state.view && !state.feed){
+                    state.feed = currentFeed;
+                    if (currentUser)
+                        state.user = currentUser.id;
+                }
 
                 if (state.source){
                     if (typeof(state.source) === "string")
@@ -236,6 +262,7 @@ angular.module('StateModule', ["PathModule"])
                 else if (currentSource) {
                     state.source = currentSource;
                     state.feed = getLastHistory("feed");
+                    console.log("State feed: ", state.feed);
                 }
             }
 
@@ -290,7 +317,6 @@ angular.module('StateModule', ["PathModule"])
             },
             replaceState: function(state){
                 state = setState(state);
-
                 if (state){
                     path.replaceState(getPathState(state));
                     if (stateHistory.length)

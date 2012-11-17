@@ -144,7 +144,7 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
         data: new yox.data(),
         events: {
             click: function(e){
-                if (e.originalEvent.target.className === "yox-theme-wall-info"){
+                if (e.originalEvent.target.nodeName !== "A"){
                     state.pushState({
                         view: true,
                         itemIndex: e.index
