@@ -16,7 +16,7 @@ a{
 a:hover{
     text-decoration: underline;
 }
-header{
+#appHeader{
     height: 55px;
     z-index: 100;
     line-height: 55px;
@@ -60,8 +60,6 @@ header{
         opacity: 0.6;
     }
 
-    header a{ color: #aaa; text-decoration: none }
-    header a:hover{ color: White }
     #title{
         line-height: 55px;
         margin: 0;
@@ -77,30 +75,30 @@ header{
         text-overflow: ellipsis;
     }
 
-    #search{
+    #headerMenu{
         position: absolute;
-        height: 53px;
+        height: 54px;
         right: 0;
         top: 0;
         padding-right: 2px;
         z-index: 5;
     }
-    #search.open{
-    }
 
-    #searchBtn{
-        display: inline-block;
-        width: 55px;
+    #headerMenu .icon{
+        display: block;
         height: 100%;
-        vertical-align: middle;
-        background: url(../img/sprites.png) no-repeat -14px -14px;
-        opacity: .6;
-        margin-top: -2px;
+        width: 54px;
+        cursor: pointer;
+        background-position: center center;
+        background-repeat: no-repeat;
+        color: White;
+        float: right;
     }
-    #searchBtn:hover{
-        opacity: 1;
-        background-color: rgba(255,255,255,.12);
-    }
+    #headerMenu .icon:hover{ background-color: rgba(255,255,255,.09); }
+    #headerMenu .icon.on{ background-color: #8d0d62; }
+    #headerMenu #messagesBtn{ background-image: url(../img/icons/message.png); }
+    #headerMenu #searchBtn{ background-image: url(../img/icons/search.png); }
+    #headerMenu #settingsBtn{ background-image: url(../img/icons/settings.png); }
 
     #searchInput{
         border-radius: 16px;
@@ -116,9 +114,9 @@ header{
     }
 
 @media only screen and (max-width:800px){
-    header h1{ font-size: 16px; }
+    #appHeader h1{ font-size: 16px; }
 }
-header h1 span{
+#appHeader h1 span{
     color: #bbb;
 }
 

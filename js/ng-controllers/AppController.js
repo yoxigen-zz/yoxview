@@ -37,6 +37,19 @@ function AppController($scope, state){
     $scope.home = function(){
         state.pushState({ home: true });
     };
+
+    $scope.togglePanel = function(btn){
+        $scope.$apply(function(){
+            var panel = btn.getAttribute("data-panel");
+            $scope.openPanel = $scope.openPanel === panel ? null : panel;
+        });
+    };
+
+    $scope.closePanel = function(){
+        $scope.$apply(function(){
+            $scope.openPanel = null;
+        });
+    };
 }
 
 AppController.$inject = ["$scope", "state"];

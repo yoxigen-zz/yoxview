@@ -15,17 +15,19 @@
     <link rel="Stylesheet" type="text/css" href="css/app.css" />
     <link rel="Stylesheet" type="text/css" href="css/albums.css" />
     <link rel="Stylesheet" type="text/css" href="css/viewer.css" />
+    <link rel="Stylesheet" type="text/css" href="css/panels.css" />
     <script src="js/external/angular-1.0.1.min.js"></script>
     <script src="js/ga.js"></script>
 </head>
 <body ng-controller="AppController" delegate="click:.userLink:selectUser">
-    <header ng-cloak>
+    <header id="appHeader" ng-cloak>
         <h1 id="appName" ng-click="home()">
             <img id="logo" src="img/logo.png" />
         </h1>
-        <div id="search" ng-class="{open:searchOpen}">
-            <input id="searchInput" type="text" placeholder="Search for people, albums and places" />
-            <a id="searchBtn" ng-click="searchOpen = !searchOpen"></a>
+        <div id="headerMenu" delegate="click:.icon:togglePanel">
+            <a class="icon" ng-class="{on:openPanel=='settings'}" id="settingsBtn" data-panel="settings" title="Settings"></a>
+            <a class="icon" ng-class="{on:openPanel=='search'}" id="searchBtn" data-panel="search" title="Search"></a>
+            <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News"></a>
         </div>
         <h2 id="title">
             <span ng-show="path.length" class="sourceIcon source_{{currentSource.provider.name}}"></span>
@@ -216,6 +218,23 @@
                     </li>
                 </ul>
             </div>
+        </div>
+    </div>
+    <div id="panels" delegate="click:.closePanelBtn:closePanel">
+        <div class="panel" ng-class="{open:openPanel=='search'}">
+            <h3>
+                <a class="closePanelBtn" title="Close"></a>
+                Search
+            </h3>
+            <div id="searchBox">
+                <input type="text" id="search" placeholder="Search for people, albums and places" />
+            </div>
+        </div>
+        <div class="panel" ng-class="{open:openPanel=='settings'}">
+            <h3>
+                <a class="closePanelBtn" title="Close"></a>
+                Settings
+            </h3>
         </div>
     </div>
     <div id="fb-root"></div>
