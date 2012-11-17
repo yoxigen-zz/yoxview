@@ -55,7 +55,7 @@ angular.module('StateModule', ["PathModule"])
                 baseState.view = state.view;
 
             if (state.itemIndex !== undefined)
-                baseState = state.itemIndex;
+                baseState.itemIndex = state.itemIndex;
 
             if (state.home)
                 baseState.home = state.home;
@@ -98,9 +98,6 @@ angular.module('StateModule', ["PathModule"])
             return null;
         }
         function setSource(source, callback){
-            if (typeof(source) === "string")
-                source = yox.data.sources[source];
-
             if (!currentSource || currentSource !== source){
                 currentSource = source;
                 eventBus.triggerEvent("sourceChange", { source: currentSource });
@@ -143,7 +140,7 @@ angular.module('StateModule', ["PathModule"])
                 itemIndex: state.itemIndex,
                 home: state.home || !state.source,
                 user: state.user || currentUser && currentUser.id
-            }
+            };
         }
 
         function setFeed(feed, state){
@@ -210,6 +207,12 @@ angular.module('StateModule', ["PathModule"])
                     state.source = currentSource;
 
                 if (state.source){
+                    if (typeof(state.source) === "string")
+                        state.source = yox.data.sources[state.source];
+
+                    if (!state.feed)
+                        state.feed = state.source.feeds[0];
+
                     setSource(state.source, function(){
                         if (state.user){
                             if (currentUser && state.user === currentUser.id && state.feed)
@@ -225,7 +228,7 @@ angular.module('StateModule', ["PathModule"])
                             }
                         }
                         else{
-                            setFeed(state.feed || currentSource && currentSource.feeds[0], state);
+                            setFeed(state.feed, state);
                             cancelCurrentUser();
                         }
                     });
@@ -260,6 +263,9 @@ angular.module('StateModule', ["PathModule"])
 
                     cancelCurrentUser();
                 }
+            },
+            getLastState: function(){
+                return $.extend(true, {}, getLastHistory());
             },
             get mode(){
                 return currentMode;

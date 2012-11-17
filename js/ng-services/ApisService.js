@@ -41,11 +41,7 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
                 },
                 beforeSelect: function(e){
                     if (e.newItem){
-                        var currentState = path.currentState;
-                        if (currentState){
-                            currentState.itemIndex = e.newItem.id - 1;
-                            path.replaceState(currentState, "Slideshow");
-                        }
+                        state.replaceState({ view: true, itemIndex:e.newItem.id - 1});
                     }
                 }
             }

@@ -296,8 +296,10 @@
 
                 // In case thumbnails are displayed before the full image, change back to the thumbnail when closing, for better performance.
                 if (this.options.showThumbnailsBeforeLoad){
-                    itemType = itemTypes[this.previousItem.type];
-                    itemType.set.call(this, this.previousItem, closingElement, true);
+                    if (this.previousItem){
+                        itemType = itemTypes[this.previousItem.type];
+                        itemType.set.call(this, this.previousItem, closingElement, true);
+                    }
                 }
                 this.transition.transition.call(this, { item: null });
                 //this.triggerEvent("select");

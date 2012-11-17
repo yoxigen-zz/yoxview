@@ -6,9 +6,9 @@ function ViewController($scope, apis, path, state){
 
     function openView(itemIndex){
         if (!apis.viewer)
-            apis.createViewer(itemIndex || 0);
+            apis.createViewer(itemIndex);
         else
-            apis.viewer.modules.view.selectItem(itemIndex || 0);
+            apis.viewer.modules.view.selectItem(itemIndex);
 
         apis.viewer.triggerEvent("resize");
     }
@@ -19,7 +19,7 @@ function ViewController($scope, apis, path, state){
                 $scope.viewEnabled = e.isOpen;
                 if (e.isOpen){
                     if (loadingFeed)
-                        itemIndexToLoadOnFeedLoad = e.itemIndex || 0;
+                        itemIndexToLoadOnFeedLoad = e.itemIndex;
                     else {
                         setTimeout(function(){
                             openView(e.itemIndex);
@@ -39,7 +39,7 @@ function ViewController($scope, apis, path, state){
         apis.thumbnails.data.removeEventListener("loadSources", onLoadData);
     }
 
-    state.onFeedChange.addListener(function(e){
+    state.onFeedChange.addListener(function(){
         loadingFeed = true;
         apis.thumbnails.data.addEventListener("loadSources", onLoadData);
     });
