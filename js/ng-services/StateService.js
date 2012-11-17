@@ -23,7 +23,7 @@ angular.module('StateModule', ["PathModule"])
 
 
                 path.onPopState.addListener(function(pathState){
-                    if (!pathState.user)
+                    if (pathState && !pathState.user)
                         cancelCurrentUser();
 
                     if (setLastStateOnPop && stateHistory.length){

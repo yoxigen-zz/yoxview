@@ -365,6 +365,7 @@ yox.data.sources.instagram = (function(){
                     }
                 }
 
+                console.log("AJAX get user: ", userId);
                 $.ajax({
                     url: apiUrl + "users/" + (userId || "self") + "?access_token=" + accessToken,
                     dataType: "jsonp",
