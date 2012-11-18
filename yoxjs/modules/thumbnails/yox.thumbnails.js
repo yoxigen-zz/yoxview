@@ -3,6 +3,7 @@
         var self = this;
         
         this.container = container instanceof jQuery ? container[0] : container;
+        this.container.classList.add("yox-thumbnails-empty");
         this.options = $.extend(true, {}, this.defaults, options);
         this.itemCount = 0;
 
@@ -86,6 +87,7 @@
             this.itemCount = 0;
             this.currentSelectedThumbnail = null;
             this.thumbnails = $();
+            this.container.classList.add("yox-thumbnails-empty");
         },
         createThumbnail: function(item){
             var self = this,
@@ -106,7 +108,8 @@
             var self = this,
                 thumbnailElements,
                 dfds,
-                addedThumbnailsCount = 0;
+                addedThumbnailsCount = 0,
+                wasEmpty = !this.thumbnails || !this.thumbnails.length;
 
             function setThumbnailToItem(thumbnailElement, item, itemIndex){
                 thumbnailElement.setAttribute("data-yoxthumbindex", itemIndex);
@@ -195,6 +198,9 @@
                 this.thumbnails = this.thumbnails.add($thumbnails);
                 thumbnailElements = $thumbnails.get();
             }
+
+            if (wasEmpty && addedThumbnailsCount)
+                this.container.classList.remove("yox-thumbnails-empty");
 
             if (!dfds)
                 this.triggerEvent("create", { thumbnails: thumbnailElements, items: source.items });

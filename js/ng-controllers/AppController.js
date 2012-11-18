@@ -34,6 +34,14 @@ function AppController($scope, state){
         });
     });
 
+    state.onFeedChange.addListener(function(e){
+        setTimeout(function(){
+            $scope.$apply(function(){
+                $scope.currentFeed = e.feed.name;
+            });
+        });
+    });
+
     $scope.home = function(){
         state.pushState({ home: true });
     };

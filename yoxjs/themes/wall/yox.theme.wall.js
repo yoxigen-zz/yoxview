@@ -265,7 +265,7 @@ yox.themes.wall = function(data, options){
             }
         }
         isLoading = false;
-        $(self.container).removeClass(classes.loading);
+        self.container && self.container.classList.remove(classes.loading);
     }
 
     function onImageLoad(){
@@ -288,7 +288,6 @@ yox.themes.wall = function(data, options){
 
     function loadItems(){
         isLoading = true;
-        $(self.container).addClass(classes.loading);
         loadMoreItems();
     }
 
@@ -300,6 +299,11 @@ yox.themes.wall = function(data, options){
         }
     }
 
+    function onLoadStart(){
+        self.container.classList.add(classes.loading);
+    }
+
+    data.addEventListener("loadSourcesStart", onLoadStart);
     data.addEventListener("loadSources", setDataSource);
     data.addEventListener("clear", function(){
         dataSource = null;
@@ -497,7 +501,7 @@ yox.themes.wall = function(data, options){
         elements.loader.style.paddingBottom = (options.borderWidth + options.padding) + "px";
 
         elements.loaderBox.appendChild(elements.loader);
-        container.appendChild(elements.loaderBox);
+        elements.wall.appendChild(elements.loaderBox);
 
         if (options.loadItemsOnScroll){
             elements.scrollElement.addEventListener("scroll", onScroll, false);

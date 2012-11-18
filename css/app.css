@@ -73,6 +73,7 @@ a:hover{
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: White;
     }
 
     #headerMenu{

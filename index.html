@@ -30,8 +30,8 @@
             <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News"></a>
         </div>
         <h2 id="title">
-            <span ng-show="path.length" class="sourceIcon source_{{currentSource.provider.name}}"></span>
-            <span ng-repeat="breadcrumb in path">{{breadcrumb.name}}</span>
+            <span ng-show="currentSource" class="sourceIcon source_{{currentSource.provider.name}}"></span>
+            {{currentFeed}}
         </h2>
     </header>
     <section id="contents" ng-cloak>
