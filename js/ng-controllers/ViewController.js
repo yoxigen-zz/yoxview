@@ -2,7 +2,8 @@ function ViewController($scope, apis, path, state){
     $scope.viewEnabled = false;
 
     var loadingFeed = false,
-        itemIndexToLoadOnFeedLoad;
+        itemIndexToLoadOnFeedLoad,
+        currentItemSource;
 
     function openView(itemIndex){
         if (!apis.viewer)
@@ -47,6 +48,7 @@ function ViewController($scope, apis, path, state){
     $scope.commentsClosed = document.documentElement.clientWidth <= 1024;
     $scope.openComments = function(){
         $scope.commentsClosed = false;
+        setCurrentItemComments();
     };
     $scope.closeComments = function(){
         $scope.commentsClosed = true;
@@ -225,12 +227,29 @@ function ViewController($scope, apis, path, state){
         }) : null;
     };
 
+    function setCurrentItemComments(){
+        if (!$scope.commentsClosed && $scope.currentItem.social && $scope.currentItem.social.commentsCount > 0 && (!$scope.currentItem.social.comments || !$scope.currentItem.social.comments.length)){
+            if (currentItemSource.getComments){
+                $scope.commentsLoading = true;
+                currentItemSource.getComments($scope.currentItem, function(result){
+                    $scope.$apply(function(){
+                        $scope.currentItem.social.comments = result.comments;
+                        if (result.paging)
+                            $scope.currentItem.social.commentsPaging = result.paging;
+
+                        $scope.commentsLoading = false;
+                    });
+                });
+            }
+        }
+    }
+
     apis.albums.addEventListener("createView", function(createEvent){
         var throttledSelect = yox.utils.performance.throttle(function(e){
             if (e.newItem){
                 if (e.newItem !== $scope.currentItem){
-                    var source = e.newItem.source.sourceType;
-                    source.getUser(function(userData){
+                    currentItemSource = e.newItem.source.sourceType;
+                    currentItemSource.getUser(function(userData){
                         $scope.$apply(function(){
                             if ($scope.likesOpen){
                                 $scope.likes = e.newItem.social && e.newItem.social.likes;
@@ -244,20 +263,7 @@ function ViewController($scope, apis, path, state){
                             $scope.currentUser = userData;
                             $scope.editingComment = false;
 
-                            if (!$scope.commentsClosed && e.newItem.social && e.newItem.social.commentsCount > 0 && (!e.newItem.social.comments || !e.newItem.social.comments.length)){
-                                if (source.getComments){
-                                    $scope.commentsLoading = true;
-                                    source.getComments(e.newItem, function(result){
-                                        $scope.$apply(function(){
-                                            $scope.currentItem.social.comments = result.comments;
-                                            if (result.paging)
-                                                $scope.currentItem.social.commentsPaging = result.paging;
-
-                                            $scope.commentsLoading = false;
-                                        });
-                                    });
-                                }
-                            }
+                            setCurrentItemComments();
                         });
                     });
                 }
