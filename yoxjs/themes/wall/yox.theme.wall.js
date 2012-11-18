@@ -489,11 +489,15 @@ yox.themes.wall = function(data, options){
                 elements.scrollElement = document;
         }
 
+	    elements.loaderBox = document.createElement("div");
+	    elements.loaderBox.className = this.getThemeClass("loader-box");
+
         elements.loader = document.createElement("div");
         elements.loader.className = this.getThemeClass("loader");
         elements.loader.style.paddingBottom = (options.borderWidth + options.padding) + "px";
 
-        container.appendChild(elements.loader);
+        elements.loaderBox.appendChild(elements.loader);
+        container.appendChild(elements.loaderBox);
 
         if (options.loadItemsOnScroll){
             elements.scrollElement.addEventListener("scroll", onScroll, false);

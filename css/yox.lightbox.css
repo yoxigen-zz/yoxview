@@ -25,13 +25,24 @@
 }
 
 .yoxviewFrame div#info{ background: rgba(0,0,0,0.5); color: White; height: 30px; bottom: 0; left: 0; width: 100%; line-height: 30px; padding-left: 10px;}
+.yox-theme-wall-loader-box{
+	clear: both;
+	height: 44px;
+	padding: 8px;
+}
+.yox-theme-wall-loader-box-empty{
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	margin-top: -32px;
+}
 .yox-theme-wall-loader{
     display: none;
     background: url(../img/loader.png) no-repeat center top;
     height: 44px;
     width: 44px;
     z-index: 2;
-    position: absolute;
+	position: relative;
     -webkit-transform: rotate(0);
     -moz-transform: rotate(0);
     transform: rotate(0);
@@ -39,19 +50,15 @@
     -moz-animation: rotating 2s linear infinite;
     animation: rotating 2s linear infinite;
     padding: 0 !important;
-    top: 50%;
-    margin-top: -22px;
-    left: 50%;
-    margin-left: -22px;
+	margin: 0 auto;
 }
+
 .yox-theme-wall-loading .yox-theme-wall-loader{ display: block }
 
 .yox-theme-wall-loadedAll{ padding-bottom: 0; margin-bottom: 0 }
 .yox-theme-wall-loadedAll .yox-theme-wall-loader{ display: none }
 
-.yox-theme-wall-thumbnails{
-    min-height: 49%;
-}
+.yox-theme-wall-thumbnails{}
     .yox-theme-wall-thumbnail{
         cursor: pointer;
         -webkit-user-select: none;
