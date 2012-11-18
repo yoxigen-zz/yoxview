@@ -48,7 +48,6 @@ function ViewController($scope, apis, path, state){
     $scope.commentsClosed = document.documentElement.clientWidth <= 1024;
     $scope.openComments = function(){
         $scope.commentsClosed = false;
-        setCurrentItemComments();
     };
     $scope.closeComments = function(){
         $scope.commentsClosed = true;
@@ -76,8 +75,10 @@ function ViewController($scope, apis, path, state){
 
         if (!$scope.commentsClosed)
             $scope.closeComments();
-        else
+        else{
             $scope.fixComments();
+            setCurrentItemComments();
+        }
     };
 
     $scope.minimizeBtnTitle = "Minimize";
