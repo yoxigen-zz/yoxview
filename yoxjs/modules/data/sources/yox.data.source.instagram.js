@@ -309,6 +309,10 @@ yox.data.sources.instagram = (function(){
         }
     }
 
+    function findUser(username){
+
+    }
+
     var public = {
         feeds: [
             { name: "My feed", url: "users/self/feed", id: "feed" },

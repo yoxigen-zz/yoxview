@@ -1,5 +1,5 @@
 angular.module('StateModule', ["PathModule"])
-    .factory('state', function(path) {
+    .factory('state', function($timeout, path) {
         var currentMode = "home", // home / thumbnails / albums / view / login
             eventBus = new yox.eventBus(),
             stateHistory = [],
@@ -161,6 +161,22 @@ angular.module('StateModule', ["PathModule"])
         }
 
         function setFeed(feed, state){
+            function doSetFeed(){
+                if (currentFeed && state.source.name === currentSource.name && feed.id === currentFeed.id && (!currentUser || currentUser.id !== state.user))
+                    return;
+
+                feedAuthAndLoad(feed, function(){
+                    if (state.view && currentMode === "thumbnails"){
+                        currentMode = "view";
+                        eventBus.triggerEvent("modeChange", { mode: "view" });
+                    }
+                    else if (!state.view && currentMode === "view"){
+                        currentMode = "thumbnails";
+                        eventBus.triggerEvent("modeChange", { mode: currentMode });
+                    }
+                });
+            }
+
             if (typeof(feed) === "string"){
                 var feeds = currentUser ? currentSource.getUserFeeds(currentUser) : currentSource.feeds;
                 for(var feedIndex = 0, sourceFeed; sourceFeed = feeds[feedIndex]; feedIndex++){
@@ -182,26 +198,10 @@ angular.module('StateModule', ["PathModule"])
                     currentMode = newMode;
                     eventBus.triggerEvent("modeChange", { mode: newMode });
                     // When a mode changes, it's necessary to wait until the UI changes before loading data, to avoid a situation where the thumbnails are not displayed and get a width/height of 0.
-                    setTimeout(doSetFeed, 1);
+                    $timeout(doSetFeed, 1);
                 }
                 else
                     doSetFeed();
-
-                function doSetFeed(){
-                    if (currentFeed && state.source.name === currentSource.name && feed.id === currentFeed.id && (!currentUser || currentUser.id !== state.user))
-                        return;
-
-                    feedAuthAndLoad(feed, function(){
-                        if (state.view && currentMode === "thumbnails"){
-                            currentMode = "view";
-                            eventBus.triggerEvent("modeChange", { mode: "view" });
-                        }
-                        else if (!state.view && currentMode === "view"){
-                            currentMode = "thumbnails";
-                            eventBus.triggerEvent("modeChange", { mode: currentMode });
-                        }
-                    });
-                }
             }
         }
 
@@ -236,7 +236,7 @@ angular.module('StateModule', ["PathModule"])
                     if (typeof(state.source) === "string")
                         state.source = yox.data.sources[state.source];
 
-                    if (!state.feed)
+                    if (!state.feed && !state.user)
                         state.feed = state.source.feeds[0];
 
                     setSource(state.source, function(){
