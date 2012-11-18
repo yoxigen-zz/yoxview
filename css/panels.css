@@ -16,8 +16,8 @@
     border-left: solid 1px #464646;
     color: White;
     -webkit-transition: -webkit-transform 300ms ease-out;
-    -moz-transition: -webkit-transform 300ms ease-out;
-    transition: -webkit-transform 300ms ease-out;
+    -moz-transition: -moz-transform 300ms ease-out;
+    transition: transform 300ms ease-out;
 
     -webkit-transform: translateX(0);
     -moz-transform: translateX(0);
