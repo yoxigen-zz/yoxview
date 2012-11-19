@@ -135,8 +135,12 @@ function ViewController($scope, apis, path, state){
 
     // TODO: Really get likes async from the source, if required.
     function getLikes(){
-        $scope.likes = $scope.currentItem.social.likes;
-        $scope.allLikes = $scope.likes.length === $scope.currentItem.social.likesCount;
+        if ($scope.currentItem.social && $scope.currentItem.social.likesCount && $scope.currentItem.social.likes.length === 0)
+            $scope.getMoreLikes();
+        else {
+            $scope.likes = $scope.currentItem.social.likes;
+            $scope.allLikes = $scope.likes.length === $scope.currentItem.social.likesCount;
+        }
     }
 
     $scope.editingComment = false;
