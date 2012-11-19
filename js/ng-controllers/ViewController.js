@@ -133,7 +133,6 @@ function ViewController($scope, apis, path, state){
             getLikes();
     };
 
-    // TODO: Really get likes async from the source, if required.
     function getLikes(){
         if ($scope.currentItem.social && $scope.currentItem.social.likesCount && $scope.currentItem.social.likes.length === 0)
             $scope.getMoreLikes();
@@ -196,9 +195,7 @@ function ViewController($scope, apis, path, state){
                 else
                     $scope.likes = e.likes;
 
-                if (!e.pagination)
-                    $scope.allLikes = true;
-
+                $scope.allLikes = !e.paging;
                 $scope.loadingLikes = false;
             });
         });
@@ -250,12 +247,9 @@ function ViewController($scope, apis, path, state){
 				currentItemSource = e.newItem.source.sourceType;
 				currentItemSource.getUser(function(userData){
 					$scope.$apply(function(){
-						if ($scope.likesOpen){
+                        $scope.likes = null;
+						if ($scope.likesOpen)
                             getLikes();
-						}
-						else
-							$scope.likes = null;
-
 
 						$scope.currentItem = e.newItem;
 						$scope.currentUser = userData;
