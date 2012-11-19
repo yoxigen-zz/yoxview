@@ -248,14 +248,14 @@ function ViewController($scope, apis, path, state){
 				currentItemSource.getUser(function(userData){
 					$scope.$apply(function(){
                         $scope.likes = null;
-						if ($scope.likesOpen)
-                            getLikes();
 
 						$scope.currentItem = e.newItem;
 						$scope.currentUser = userData;
 						$scope.editingComment = false;
 
 						setCurrentItemComments();
+                        if ($scope.likesOpen)
+                            getLikes();
 					});
 				});
 			}

@@ -544,6 +544,10 @@
     font-size: 12pt;
     text-decoration: none;
     padding: 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
 }
 #viewer_likes_list li:first-child .like_contact{
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 1) inset;
@@ -568,7 +572,7 @@
     width: 19px;
     height: 19px;
     display: block;
-    margin-right: 19px;
+    margin-right: 2px;
     background: url(../img/info_icons.png) no-repeat 0 -185px;
     margin-top: 16px;
 }
