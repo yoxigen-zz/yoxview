@@ -398,10 +398,6 @@ yox.data.sources.instagram = (function(){
                     }
                 }
 
-	            function getUserData(){
-
-	            }
-
 	            if (/^\d+$/.test(userId)){
 		            queryEndpoint("users/" + (userId || "self"), function(instagramData){
 			            if (instagramData.data)
