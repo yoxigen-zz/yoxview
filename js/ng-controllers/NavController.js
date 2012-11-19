@@ -27,10 +27,8 @@ function NavController($scope, path, apis, state){
             if (source.provider.getUser){
                 source.provider.getUser(function(user){
                     if (user){
-                        setTimeout(function(){
-                            $scope.$apply(function(){
-                                source.currentUser = user;
-                            });
+                        $scope.safeApply(function(){
+                            source.currentUser = user;
                         });
                     }
                 });
@@ -61,57 +59,51 @@ function NavController($scope, path, apis, state){
     });
 
     state.onFeedChange.addListener(function(e){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                if ($scope.currentFeed)
-                    $scope.currentFeed.selected = false;
+        $scope.safeApply(function(){
+            if ($scope.currentFeed)
+                $scope.currentFeed.selected = false;
 
-                for(var i= 0, feed; feed = $scope.sourceFeeds[i]; i++){
-                    if (feed.id === e.feed.id){
-                        feed.selected = true;
-                        $scope.currentFeed = feed;
-                        break;
-                    }
+            for(var i= 0, feed; feed = $scope.sourceFeeds[i]; i++){
+                if (feed.id === e.feed.id){
+                    feed.selected = true;
+                    $scope.currentFeed = feed;
+                    break;
                 }
+            }
 
-                if (e.feed.hasChildren){
-                    $scope.currentNav = 2;
-                }
-                else{
-                    $scope.currentNav = 1;
-                }
-            });
+            if (e.feed.hasChildren){
+                $scope.currentNav = 2;
+            }
+            else{
+                $scope.currentNav = 1;
+            }
         });
     });
 
     state.onUserSelect.addListener(function(e){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                if (e.user){
-                    $scope.user = e.user;
-                    $scope.user.feeds = e.source.getUserFeeds(e.user);
-                    $scope.currentSource = findSource(e.source.name);
+        $scope.safeApply(function(){
+            if (e.user){
+                $scope.user = e.user;
+                $scope.user.feeds = e.source.getUserFeeds(e.user);
+                $scope.currentSource = findSource(e.source.name);
 
-                    state.replaceState({
-                        user:e.user.id,
-                        source:e.source,
-                        feed: $scope.user.feeds[0]
-                    }, { replace: true });
-                }
-                else
-                    $scope.user = null;
-            });
+                state.replaceState({
+                    user:e.user.id,
+                    source:e.source,
+                    feed: $scope.user.feeds[0]
+                }, { replace: true });
+            }
+            else
+                $scope.user = null;
         });
     });
 
     state.onModeChange.addListener(function(e){
         var nav = modeNavs[e.mode];
         if (nav !== undefined){
-            setTimeout(function(){
-                $scope.$apply(function(){
-                    $scope.currentNav = nav;
-                });
-            })
+            $scope.safeApply(function(){
+                $scope.currentNav = nav;
+            });
         }
     });
 
@@ -156,24 +148,8 @@ function NavController($scope, path, apis, state){
                     apis.albums.data.source(sourceData);
                 }, 1);
             }
-            else{
-                setTimeout(function(){
-                    $scope.$apply(function(){
-                        $scope.$parent.view = "thumbnails";
-                    });
-                });
-                setTimeout(function(){
-                    apis.thumbnails.data.source(sourceData);
-                }, 1);
-            }
             */
         //}
-
-        //$scope.$emit("titleChange", [feed]);
-        //apis.albums.triggerEvent("openFeed", { provider: $scope.currentSource.provider, feed: feed });
-
-        //if (!state)
-            //path.pushState({ source: $scope.currentSource.provider.name, feed: feed.id });
     };
 
     var albumIdToSelectAfterLoad;
@@ -223,11 +199,9 @@ function NavController($scope, path, apis, state){
     };
 
     apis.albums.addEventListener("openAlbum", function(){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                $scope.$parent.view = "thumbnails";
-            });
-        }, 1);
+        $scope.safeApply(function(){
+            $scope.$parent.view = "thumbnails";
+        });
     });
 
     $scope.back = function(){

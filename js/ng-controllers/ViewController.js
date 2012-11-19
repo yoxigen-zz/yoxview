@@ -1,4 +1,4 @@
-function ViewController($scope, apis, path, state){
+function ViewController($scope, apis, state){
     $scope.viewEnabled = false;
 
     var loadingFeed = false,
@@ -15,19 +15,17 @@ function ViewController($scope, apis, path, state){
     }
 
     state.onViewStateChange.addListener(function(e){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                $scope.viewEnabled = e.isOpen;
-                if (e.isOpen){
-                    if (loadingFeed)
-                        itemIndexToLoadOnFeedLoad = e.itemIndex;
-                    else {
-                        setTimeout(function(){
-                            openView(e.itemIndex);
-                        }, 10);
-                    };
-                }
-            });
+        $scope.safeApply(function(){
+            $scope.viewEnabled = e.isOpen;
+            if (e.isOpen){
+                if (loadingFeed)
+                    itemIndexToLoadOnFeedLoad = e.itemIndex;
+                else {
+                    setTimeout(function(){
+                        openView(e.itemIndex);
+                    }, 10);
+                };
+            }
         });
     });
 
@@ -257,7 +255,7 @@ function ViewController($scope, apis, path, state){
 			}
 		}
 		else{
-			$scope.$apply(function(){
+			$scope.safeApply(function(){
 				$scope.currentItem = null;
 				$scope.editingComment = false;
 				$scope.likesOpen = false;
@@ -302,4 +300,4 @@ function ViewController($scope, apis, path, state){
 
 }
 
-ViewController.$inject = ["$scope", "apis", "path", "state"];
+ViewController.$inject = ["$scope", "apis", "state"];

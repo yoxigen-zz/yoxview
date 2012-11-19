@@ -27,18 +27,14 @@ function AppController($scope, state){
     };
 
     state.onModeChange.addListener(function(e){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                $scope.view = e.mode;
-            });
+        $scope.safeApply(function(){
+            $scope.view = e.mode;
         });
     });
 
     state.onFeedChange.addListener(function(e){
-        setTimeout(function(){
-            $scope.$apply(function(){
-                $scope.currentFeed = e.feed.name;
-            });
+        $scope.safeApply(function(){
+            $scope.currentFeed = e.feed.name;
         });
     });
 
@@ -57,6 +53,16 @@ function AppController($scope, state){
         $scope.$apply(function(){
             $scope.openPanel = null;
         });
+    };
+
+    // By Alex Vanston, https://coderwall.com/p/ngisma:
+    $scope.safeApply = function(fn) {
+        var phase = this.$root.$$phase;
+        if(phase == '$apply' || phase == '$digest') {
+            fn();
+        } else {
+            this.$apply(fn);
+        }
     };
 }
 
