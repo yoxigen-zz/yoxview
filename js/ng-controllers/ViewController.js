@@ -251,8 +251,7 @@ function ViewController($scope, apis, path, state){
 				currentItemSource.getUser(function(userData){
 					$scope.$apply(function(){
 						if ($scope.likesOpen){
-							$scope.likes = e.newItem.social && e.newItem.social.likes;
-							$scope.allLikes = e.newItem.social && e.newItem.social.likesCount !== undefined ? $scope.likes.length === e.newItem.social.likesCount : true;
+                            getLikes();
 						}
 						else
 							$scope.likes = null;
