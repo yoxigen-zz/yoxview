@@ -309,6 +309,16 @@ yox.utils = {
         }
     },
     url: {
+	    jsonToQuery: function(data){
+	        if (!data || Object(data) !== data)
+	            return "";
+
+		    var query = [];
+		    for(var p in data){
+			    query.push([p, encodeURIComponent(data[p])].join("="));
+		    }
+		    return query.join("&");
+		},
         queryToJson: function(query)
         {
             if (!query)

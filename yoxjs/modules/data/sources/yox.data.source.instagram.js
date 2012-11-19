@@ -18,6 +18,29 @@ yox.data.sources.instagram = (function(){
         isLogin = true;
     }
 
+	function queryEndpoint(endpoint, parameters, callback, onError){
+		if (typeof(parameters) === "function"){
+			onError = callback;
+			callback = parameters;
+			parameters = null;
+		}
+
+		var params = $.extend({ access_token: accessToken }, parameters);
+
+		$.ajax({
+			url: apiUrl + endpoint,
+			data: params,
+			dataType: 'jsonp',
+			jsonpCallback: "callback",
+			success: function(instagramData){
+				callback(instagramData);
+			},
+			error: function(e){
+				onError && onError(e);
+			}
+		});
+	}
+
     function getCachedUsers(callback){
         if (!cachedUsers){
             var storageData = localStorage.getItem("yox_instagram_users");
@@ -96,15 +119,20 @@ yox.data.sources.instagram = (function(){
         return comments;
     }
 
-    function getLikes(instagramLikes){
-        var likes = [];
-        for (var i= 0, user; user = instagramLikes[i]; i++){
-            likes.push(getUserData(user));
-        }
-        
-        return likes;
-    }
-        
+	/**
+	 * Converts an array of Instagram user objects to an array of Yox user objects.
+	 * @param users
+	 * @return {Array}
+	 */
+	function convertUsersData(users){
+		var usersData = [];
+		for (var i= 0, user; user = users[i]; i++){
+			usersData.push(getUserData(user));
+		}
+
+		return usersData;
+	}
+
     function getImageData(imageData, options){
         var image = imageData.images.standard_resolution,
             itemData = {
@@ -123,7 +151,7 @@ yox.data.sources.instagram = (function(){
                     comments: getComments(imageData.comments.data),
                     likesCount: imageData.likes.count,
                     like: imageData.user_has_liked,
-                    likes: getLikes(imageData.likes.data)
+                    likes: convertUsersData(imageData.likes.data)
                 },
                 author: getUserData(imageData.user)
             };
@@ -244,7 +272,7 @@ yox.data.sources.instagram = (function(){
     }
 
     function getFeedUrl(source, callback){
-        var url = apiUrl;
+        var url = "";
 
         if (source.url){
             if (/\?access_token=/.test(source.url)){
@@ -280,37 +308,43 @@ yox.data.sources.instagram = (function(){
         }
         else{
             getFeedUrl(source, function(url){
-                $.ajax({
-                    url: url,
-                    dataType: 'jsonp',
-                    jsonpCallback: "igcallback",
-                    success: function(instagramData)
-                    {
-                        var returnData = {
-                            source: source,
-                            sourceType: dataSourceName,
-                            createThumbnails: true,
-                            items: getItemsData(instagramData.data)
-                        };
+	            queryEndpoint(url, function(instagramData){
+                    var returnData = {
+                        source: source,
+                        sourceType: dataSourceName,
+                        createThumbnails: true,
+                        items: getItemsData(instagramData.data)
+                    };
 
-                        if (instagramData.pagination){
-                            returnData.paging = {
-                                next: { url: instagramData.pagination.next_url, type: dataSourceName }
-                            }
+                    if (instagramData.pagination){
+                        returnData.paging = {
+                            next: { url: instagramData.pagination.next_url.replace(apiUrl, ""), type: dataSourceName }
                         }
-
-                        if (callback)
-                            callback(returnData);
-
-                        deferred.resolve(returnData);
                     }
+
+                    if (callback)
+                        callback(returnData);
+
+                    deferred.resolve(returnData);
                 });
             });
         }
     }
 
-    function findUser(username){
-
+    function findUsers(query, limit, callback){
+	    if (typeof(limit) === "function"){
+	        callback = limit;
+		    limit = undefined;
+	    }
+	    queryEndpoint("users/search", { q: query, count: limit }, function(instagramData){
+		    if (instagramData && instagramData.data){
+			    callback(convertUsersData(instagramData.data));
+		    }
+		    else
+		        callback([]);
+	    }, function(error){
+		    console.error("Error searching for Instagram users: ", error);
+	    });
     }
 
     var public = {
@@ -326,29 +360,24 @@ yox.data.sources.instagram = (function(){
             if (!callback || !item || !item.originalId){
                 throw new Error("Invalid call to getLikes, requires both item and callback parameters.")
             }
-
-            $.ajax({
-                url: apiUrl + "media/" + item.originalId + "/likes?access_token=" + accessToken,
-                dataType: "jsonp",
-                jsonpCallback: "callback",
-                success: function(instagramData){
+	        queryEndpoint("media/" + item.originalId + "/likes", function(instagramData){
                     var likes;
                     if (instagramData.data)
-                        likes = getLikes(instagramData.data);
+                        likes = convertUsersData(instagramData.data);
                     else
                         likes = [];
 
                     callback({ likes: likes });
                 },
-                error: function(e){
+                function(e){
                     callback({ error: e });
                 }
-            });
+            );
         },
         getNews: function(callback){
             return isLogin ? public.load(public.feeds[0], callback) : null;
         },
-        getUser: function(userId, callback){
+        getUser: function(userId, callback, onError){
             if (typeof(userId) === "function"){
                 callback = userId;
                 userId = null;
@@ -369,26 +398,34 @@ yox.data.sources.instagram = (function(){
                     }
                 }
 
-                console.log("AJAX get user: ", userId);
-                $.ajax({
-                    url: apiUrl + "users/" + (userId || "self") + "?access_token=" + accessToken,
-                    dataType: "jsonp",
-                    jsonpCallback: "callback",
-                    success: function(instagramData)
-                    {
-                        if (instagramData.data)
-                            var userData = getUserData(instagramData.data);
-                        else
-                            userData = { id: userId, source: dataSourceName };
+	            function getUserData(){
 
-                        if (!userId){
-                            currentUser = userData;
-                            localStorage.setItem("yox_instagram_user", JSON.stringify(userData));
-                        }
+	            }
 
-                        callback(userData);
-                    }
-                });
+	            if (/^\d+$/.test(userId)){
+		            queryEndpoint("users/" + (userId || "self"), function(instagramData){
+			            if (instagramData.data)
+				            var userData = getUserData(instagramData.data);
+			            else
+				            userData = { id: userId, source: dataSourceName };
+
+			            if (!userId){
+				            currentUser = userData;
+				            localStorage.setItem("yox_instagram_user", JSON.stringify(userData));
+			            }
+
+			            callback(userData);
+		            }, onError);
+	            }
+	            else{
+		            findUsers(userId, function(foundUsers){
+			            if (foundUsers.length && foundUsers[0].username === userId){
+				            callback(foundUsers[0]);
+			            }
+			            else
+			                callback(null);
+		            });
+	            }
             }
             else
                 callback(null);
