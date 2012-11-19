@@ -190,11 +190,7 @@ function ViewController($scope, apis, path, state){
         $scope.loadingLikes = true;
         $scope.currentItem.getLikes(function(e){
             $scope.$apply(function(){
-                if (e.append)
-                    $scope.likes = $scope.likes.concat(e.likes);
-                else
-                    $scope.likes = e.likes;
-
+                $scope.likes = ($scope.likes || []).concat(e.likes);
                 $scope.currentItem.social.likes = $scope.likes;
                 $scope.currentItem.social.likesPaging = e.paging;
                 $scope.allLikes = !e.paging;
