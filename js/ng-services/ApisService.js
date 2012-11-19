@@ -184,13 +184,13 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
             if (item.social.likesCount){
                 var likes = document.createElement("span");
                 likes.className = "yox-theme-wall-info-likes";
-                likes.textContent = item.social.likesCount;
+                likes.textContent = yox.utils.strings.formatNumber(item.social.likesCount);
                 social.appendChild(likes);
             }
             if (item.social.commentsCount){
                 var comments = document.createElement("span");
                 comments.className = "yox-theme-wall-info-comments";
-                comments.textContent = item.social.commentsCount;
+                comments.textContent = yox.utils.strings.formatNumber(item.social.commentsCount);
                 social.appendChild(comments);
             }
             meta.appendChild(social);

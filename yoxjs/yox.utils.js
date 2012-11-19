@@ -284,6 +284,15 @@ yox.utils = {
         }
     },
     strings: {
+	    formatNumber: function(number){
+			if (isNaN(number))
+				return "";
+
+			if (number < 1000)
+				return number;
+
+			return (number / 1000).toFixed(1) + "k";
+		},
         getDirection: function(str){
             return yox.utils.strings.isRtl(str) ? "rtl" : "ltr"
         },

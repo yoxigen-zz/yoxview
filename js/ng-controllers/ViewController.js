@@ -86,15 +86,7 @@ function ViewController($scope, apis, path, state){
         return $scope.currentItem && $scope.currentItem.social && $scope.currentItem.social.like ? "Unlike" : "Like";
     };
 
-    $scope.getCountStr = function(count){
-        if (isNaN(count))
-            return "";
-
-        if (!$scope.commentsClosed || count < 1000)
-            return count;
-
-        return (count / 1000).toFixed(1) + "k";
-    };
+    $scope.getCountStr = yox.utils.strings.formatNumber;
 
     $scope.getDirection = function(text){
         return yox.utils.strings.isRtl(text) ? "rtl" : "ltr";
