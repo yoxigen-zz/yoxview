@@ -195,6 +195,8 @@ function ViewController($scope, apis, path, state){
                 else
                     $scope.likes = e.likes;
 
+                $scope.currentItem.social.likes = $scope.likes;
+                $scope.currentItem.social.likesPaging = e.paging;
                 $scope.allLikes = !e.paging;
                 $scope.loadingLikes = false;
             });
@@ -228,9 +230,7 @@ function ViewController($scope, apis, path, state){
                 currentItemSource.getComments($scope.currentItem, function(result){
                     $scope.$apply(function(){
                         $scope.currentItem.social.comments = result.comments;
-                        if (result.paging)
-                            $scope.currentItem.social.commentsPaging = result.paging;
-
+                        $scope.currentItem.social.commentsPaging = result.paging;
                         $scope.commentsLoading = false;
                     });
                 });

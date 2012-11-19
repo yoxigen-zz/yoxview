@@ -495,7 +495,7 @@ yox.data.sources.facebook = (function(){
                 throw new Error("Invalid call to getLikes, requires both item and callback parameters.")
             }
 
-            FB.api(item.originalId + "/likes", function(result){
+            FB.api(item.social.likesPaging && item.social.likesPaging.next || item.originalId + "/likes", function(result){
                 var likes = convertUsersData(result.data),
                     paging = likes.length < item.social.likesCount && result.paging ? result.paging : null;
 
