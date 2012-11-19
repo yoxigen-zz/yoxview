@@ -245,41 +245,63 @@ function ViewController($scope, apis, path, state){
         }
     }
 
+	var throttleSelect = false,
+		throttleSelectTimeoutId;
+
+	function selectItem(e){
+		if (e.newItem){
+			if (e.newItem !== $scope.currentItem){
+				currentItemSource = e.newItem.source.sourceType;
+				currentItemSource.getUser(function(userData){
+					$scope.$apply(function(){
+						if ($scope.likesOpen){
+							$scope.likes = e.newItem.social && e.newItem.social.likes;
+							$scope.allLikes = e.newItem.social && e.newItem.social.likesCount !== undefined ? $scope.likes.length === e.newItem.social.likesCount : true;
+						}
+						else
+							$scope.likes = null;
+
+
+						$scope.currentItem = e.newItem;
+						$scope.currentUser = userData;
+						$scope.editingComment = false;
+
+						setCurrentItemComments();
+					});
+				});
+			}
+		}
+		else{
+			$scope.$apply(function(){
+				$scope.currentItem = null;
+				$scope.editingComment = false;
+				$scope.likesOpen = false;
+			});
+		}
+	}
+
     apis.albums.addEventListener("createView", function(createEvent){
-        var throttledSelect = yox.utils.performance.throttle(function(e){
-            if (e.newItem){
-                if (e.newItem !== $scope.currentItem){
-                    currentItemSource = e.newItem.source.sourceType;
-                    currentItemSource.getUser(function(userData){
-                        $scope.$apply(function(){
-                            if ($scope.likesOpen){
-                                $scope.likes = e.newItem.social && e.newItem.social.likes;
-                                $scope.allLikes = e.newItem.social && e.newItem.social.likesCount !== undefined ? $scope.likes.length === e.newItem.social.likesCount : true;
-                            }
-                            else
-                                $scope.likes = null;
+	    var throttleSelectTime = 500,
+            throttledSelect = yox.utils.performance.throttle(selectItem, throttleSelectTime);
 
-
-                            $scope.currentItem = e.newItem;
-                            $scope.currentUser = userData;
-                            $scope.editingComment = false;
-
-                            setCurrentItemComments();
-                        });
-                    });
-                }
-            }
-            else{
-                $scope.$apply(function(){
-                    $scope.currentItem = null;
-                    $scope.editingComment = false;
-                    $scope.likesOpen = false;
-                });
-            }
-        }, 500);
-
-        throttledSelect({ newItem: createEvent.item });
-        apis.viewer.addEventListener("beforeSelect", throttledSelect);
+	    function enableSelectThrottle(){
+		    throttleSelectTimeoutId = setTimeout(function(){
+			    throttleSelect = false;
+		    }, throttleSelectTime * 2);
+	    }
+	    selectItem({ newItem: createEvent.item });
+        apis.viewer.addEventListener("beforeSelect", function(e){
+	        if (throttleSelect){
+		        clearTimeout(throttleSelectTimeoutId);
+		        throttledSelect(e);
+		        enableSelectThrottle();
+	        }
+	        else{
+		        selectItem(e);
+		        throttleSelect = true;
+		        enableSelectThrottle();
+	        }
+        });
     });
 
     $scope.formatDate = function(date){
