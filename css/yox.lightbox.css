@@ -39,6 +39,9 @@
 .yox-thumbnails-empty .yox-theme-wall-loader-box{
 	top: 50%;
 	margin-top: -32px;
+    background: none;
+    box-shadow: none;
+    border-top: none;
 }
 .yox-theme-wall-loadedAll .yox-theme-wall-loader-box{ display: none }
 .yox-theme-wall-loader{
