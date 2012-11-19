@@ -66,6 +66,20 @@ yox.data.sources.facebook = (function(){
         return cacheObj;
     }
 
+    /**
+     * Converts an array of Facebook user objects to an array of Yox user objects.
+     * @param users
+     * @return {Array}
+     */
+    function convertUsersData(users){
+        var usersData = [];
+        for (var i= 0, user; user = users[i]; i++){
+            usersData.push(getUserData(user));
+        }
+
+        return usersData;
+    }
+
     function getUserData(data){
         return {
             id: data.id,
@@ -93,15 +107,6 @@ yox.data.sources.facebook = (function(){
         return comments;
     }
 
-    function getLikes(fbLikes){
-        var likes = [];
-        for (var i= 0, user; user = fbLikes[i]; i++){
-            likes.push(getUserData(user));
-        }
-
-        return likes;
-    }
-
     function getImageData(photoData, options){
         var image = photoData.images[0],
             itemData = {
@@ -118,7 +123,7 @@ yox.data.sources.facebook = (function(){
                 social: {
                     comments: photoData.comments ? getComments(photoData.comments.data) : [],
                     commentsCount: photoData.comments ? photoData.comments.data.length : 0,
-                    likes: photoData.likes ? getLikes(photoData.likes.data) : [],
+                    likes: photoData.likes ? convertUsersData(photoData.likes.data) : [],
                     likesCount: photoData.likes ? photoData.likes.data.length : 0
                 },
                 originalId: photoData.id
@@ -475,18 +480,26 @@ yox.data.sources.facebook = (function(){
                 userId = "me";
 
             FB.api(userId + "/friends", function(result){
-                var users = [],
-                    returnData = {};
+                var returnData = {
+                    users: convertUsersData(result.data)
+                };
 
-                for(var i= 0, user; user = result.data[i]; i++){
-                    users.push(getUserData(user));
-                }
-
-                returnData.users = users;
                 if (result.paging)
                     returnData.paging = result.paging;
 
                 callback(returnData);
+            });
+        },
+        getLikes: function(item, callback){
+            if (!callback || !item || !item.originalId){
+                throw new Error("Invalid call to getLikes, requires both item and callback parameters.")
+            }
+
+            FB.api(item.originalId + "/likes", function(result){
+                var likes = convertUsersData(result.data),
+                    paging = likes.length < item.social.likesCount && result.paging ? result.paging : null;
+
+                callback({ likes: likes, paging: paging });
             });
         },
         getNews: function(callback){
