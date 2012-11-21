@@ -205,10 +205,6 @@ yox.data.sources.facebook = (function(){
         return data;
     }
 
-    function getPhotoData(photoId, callback){
-        FB.api(photoId, "get", {}, callback);
-    }
-
     function getPhotosData(fbData, options, callback){
         var itemsData = [],
             dataFunction = getImageData,
@@ -585,6 +581,9 @@ yox.data.sources.facebook = (function(){
         },
         name: dataSourceName,
         requireAuth: true,
+        search: function(term, options){
+            var dfd = $.Deferred();
+        },
         social: {
             comment: function(itemId, text, callback){
                 FB.api(itemId + "/comments", "post", { message: text }, function(response){

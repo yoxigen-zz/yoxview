@@ -222,7 +222,7 @@ yox.data.sources.instagram = (function(){
         deferred.resolve(albumsData);
     }
 
-    function prepareGetUsers(endpoint){
+    function  prepareGetUsers(endpoint){
         return function(userId, callback){
             if (typeof(userId) === "function"){
                 callback = userId;
