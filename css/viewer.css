@@ -529,44 +529,9 @@
     left: 0;
     right: -20px;
     bottom: 0;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-#viewer_likes_list .like_contact{
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset, 0 -1px 0 rgba(0, 0, 0, .35) inset;
-    height: 49px;
-    line-height: 50px;
-    color: White;
-    display: block;
-    font-size: 12pt;
-    text-decoration: none;
-    padding: 4px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-right: 10px;
-}
-#viewer_likes_list li:first-child .like_contact{
-    box-shadow: 0 -1px 0 rgba(0, 0, 0, 1) inset;
-}
-#viewer_likes.allLikes li:nth-last-child(2) .like_contact{
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
+
 }
 
-#viewer_likes_list .like_contact:hover{
-    background: rgba(255,255,255,.1);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset !important;
-}
-#viewer_likes_list .like_contact .avatar{
-    float: left;
-    margin: 3px 10px;
-    height: 40px;
-    width: 40px;
-    border: solid 1px rgba(255,255,255,.2);
-}
 .like_contact_add{
     float: right;
     width: 19px;

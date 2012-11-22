@@ -195,16 +195,16 @@
                 <h3>{{getCountStr(currentItem.social.likesCount)}} Likes
                     <a ng-click="toggleLikesOpen()"><span class="chevronIcon" ng-class="{chevronIconClose:likesOpen}" title="{{minimizeBtnTitle}}"></span></a>
                 </h3>
-                <ul id="viewer_likes_list">
+                <ul id="viewer_likes_list" class="usersList">
                     <li>
-                        <a id="viewer_likes_like" class="like_contact" ng-click="toggleLike($event)" ng-class="{liked:currentItem.social.like}" title="Click to {{getLikeCommand(true)}}">
+                        <a id="viewer_likes_like" class="userItem" ng-click="toggleLike($event)" ng-class="{liked:currentItem.social.like}" title="Click to {{getLikeCommand(true)}}">
                             <img class="avatar" ng-src="{{currentUser.avatar}}" />
                             {{currentUser.username || currentUser.name}}
                             <span class='like_contact_add'></span>
                         </a>
                     </li>
                     <li ng-repeat="contact in likes">
-                        <a class="innerLink userLink like_contact" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
+                        <a class="innerLink userLink userItem" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
                             <img class="avatar" ng-src="{{contact.avatar}}" />
                             {{contact.username || contact.name}}
                         </a>
@@ -221,13 +221,38 @@
         </div>
     </div>
     <div id="panels" delegate="click:.closePanelBtn:closePanel">
-        <div class="panel" ng-class="{open:openPanel=='search'}">
+        <div class="panel" ng-class="{open:openPanel=='search'}" ng-controller="SearchController">
             <h3>
                 <a class="closePanelBtn" title="Close"></a>
                 Search
             </h3>
             <div id="searchBox">
-                <input type="text" id="search" placeholder="Search for people, albums and places" />
+                <form ng-submit="search()">
+                    <input type="text" ng-model="searchTerm" id="search" placeholder="Search for people, albums and places" />
+                </form>
+            </div>
+            <div id="searchResults">
+                <section class="searchResults" ng-show="results.users.length">
+                    <h4>Users</h4>
+                    <ul class="searchResultsList usersList">
+                        <li ng-repeat="user in results.users">
+                            <a class="innerLink userLink userItem" href="?/{{user.source.name}}/user/{{user.id}}">
+                                <img class="avatar" ng-src="{{user.avatar}}" />
+                                {{user.username || user.name}}
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+                <section class="searchResults" ng-show="results.tags.length">
+                    <h4>Tags</h4>
+                    <ul class="searchResultsList searchResultsList_tags">
+                        <li ng-repeat="tag in results.tags">
+                            <a class="innerLink tagLink" href="?/{{tag.source.name}}/tag/{{tag.name}}">
+                                #{{tag.name}}
+                            </a>
+                        </li>
+                    </ul>
+                </section>
             </div>
         </div>
         <div class="panel" ng-class="{open:openPanel=='settings'}">
@@ -247,6 +272,7 @@
     <script type="text/javascript" src="yoxjs/yox.cache.js"></script>
     <script type="text/javascript" src="yoxjs/modules/data/yox.data.js"></script>
     <script type="text/javascript" src="yoxjs/modules/data/yox.data.item.js"></script>
+    <script type="text/javascript" src="yoxjs/modules/data/yox.data.search.js"></script>
     <script type="text/javascript" src="yoxjs/modules/thumbnails/yox.thumbnails.js"></script>
     <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.js"></script>
     <script type="text/javascript" src="yoxjs/modules/data/sources/yox.data.source.picasa.js"></script>
@@ -273,9 +299,11 @@
     <script src="js/ng-services/PathService.js"></script>
     <script src="js/ng-services/ApisService.js"></script>
     <script src="js/ng-services/StateService.js"></script>
+    <script src="js/ng-services/SearchService.js"></script>
     <script src="js/ng-directives/DelegateDirective.js"></script>
     <script src="js/ng-controllers/NavController.js"></script>
     <script src="js/ng-controllers/ViewController.js"></script>
     <script src="js/ng-controllers/AppController.js"></script>
+    <script src="js/ng-controllers/SearchController.js"></script>
 </body>
 </html>

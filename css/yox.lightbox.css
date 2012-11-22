@@ -115,7 +115,7 @@
     .yox-theme-switcher-open .yox-theme-wall-thumbnails a{ opacity: .2; background: Transparent; }
     .yox-theme-wall-thumbnail:hover{
         opacity: 1;
-        z-index: 99;
+        z-index: 90;
     }
     .yox-theme-wall-thumbnailInfo{
         position: absolute;

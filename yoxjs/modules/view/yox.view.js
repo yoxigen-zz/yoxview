@@ -623,11 +623,11 @@
         keys: {
             right: "next",
             left: "prev",
-            enter: "toggleSlideshow",
+            //enter: "toggleSlideshow",
             escape: "close",
             home: "first",
-            end: "last",
-            space: "next"
+            end: "last"
+            //space: "next"
         }
     };
 })(jQuery);

@@ -581,9 +581,6 @@ yox.data.sources.facebook = (function(){
         },
         name: dataSourceName,
         requireAuth: true,
-        search: function(term, options){
-            var dfd = $.Deferred();
-        },
         social: {
             comment: function(itemId, text, callback){
                 FB.api(itemId + "/comments", "post", { message: text }, function(response){

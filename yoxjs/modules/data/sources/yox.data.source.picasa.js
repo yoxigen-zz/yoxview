@@ -398,6 +398,7 @@ yox.data.sources.picasa = (function(){
         map: { pageSize: "max-results", offset: "start-index" },
         match: function(source){ return source.url && picasaRegex.test(source.url); },
         name: dataSourceName,
+        /*
         search: function(term, options, callback){
             if (options.searchType === "tags")
                 options.tag = term;
@@ -412,6 +413,7 @@ yox.data.sources.picasa = (function(){
 
             return dfd.promise();
         },
+        */
         sourceName: "Picasa"
     };
 

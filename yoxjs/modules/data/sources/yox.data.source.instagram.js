@@ -18,6 +18,122 @@ yox.data.sources.instagram = (function(){
         isLogin = true;
     }
 
+    var convert = {
+        comments: function(instagramComments){
+            var comments = [];
+            for (var i= 0, comment; comment = instagramComments[i]; i++){
+                comments.push({
+                    id: comment.id,
+                    time: new Date(comment.created_time * 1000),
+                    user: convert.user(comment.from),
+                    text: comment.text
+                });
+            }
+
+            return comments;
+        },
+        image: function(imageData){
+            var image = imageData.images.standard_resolution,
+                itemData = {
+                    originalId: imageData.id,
+                    thumbnail: convert.thumbnail(imageData.images.low_resolution),
+                    url: image.url,
+                    width: image.width,
+                    height: image.height,
+                    ratio: image.height / image.width,
+                    link: imageData.link,
+                    title: imageData.caption ? imageData.caption.text : null,
+                    type: "image",
+                    time: new Date(imageData.created_time * 1000),
+                    social: {
+                        commentsCount: imageData.comments.count,
+                        comments: convert.comments(imageData.comments.data),
+                        likesCount: imageData.likes.count,
+                        like: imageData.user_has_liked,
+                        likes: convert.users(imageData.likes.data)
+                    },
+                    author: convert.user(imageData.user)
+                };
+
+            return itemData;
+        },
+        images: function(instagramData){
+            var itemsData = [];
+            if (instagramData){
+                for(var i=0, item; item = instagramData[i]; i++){
+                    itemsData.push(convert.image(item));
+                }
+            }
+            return itemsData;
+        },
+        user: function(instagramUser){
+            return {
+                name: instagramUser.full_name,
+                id: instagramUser.id,
+                avatar: instagramUser.profile_picture,
+                username: instagramUser.username,
+                website: instagramUser.website,
+                source: dataSourceName
+            };
+        },
+        users: function(users){
+            var usersData = [];
+            for (var i= 0, user; user = users[i]; i++){
+                usersData.push(convert.user(user));
+            }
+
+            return usersData;
+        },
+        tags: function(instagramTags){
+            var normalizedTags = [];
+            for(var i= 0, tag; tag = instagramTags[i]; i++){
+                normalizedTags.push({ name: tag.name, count: tag.media_count });
+            }
+            return normalizedTags;
+        },
+        thumbnail: function(photo){
+            return {
+                src: photo.url,
+                width: photo.width,
+                height: photo.height,
+                ratio: photo.height / photo.width
+            };
+        }
+    };
+
+    var search = {
+        tags: function(term){
+            var deferred = $.Deferred();
+            currentSearch.tags = queryEndpoint("tags/search", { q: term }, function(instagramData){
+                var result = { type: "tags" };
+                result.results = instagramData && instagramData.data ? convert.tags(instagramData.data) : [];
+                deferred.resolve(result);
+                currentSearch.tags = null;
+            },
+            function(error){
+                deferred.reject({ error: error });
+                currentSearch.tags = null;
+            });
+
+            return deferred;
+        },
+        users: function(term, options){
+            var deferred = $.Deferred();
+            currentSearch.users = queryEndpoint("users/search", { q: term, count: options.limit }, function(instagramData){
+                var result = { type: "users" };
+                result.results = instagramData && instagramData.data ? convert.users(instagramData.data) : [];
+                deferred.resolve(result);
+                currentSearch.users = null;
+            }, function(error){
+                deferred.reject({ error: error });
+                currentSearch.users = null;
+            });
+
+            return deferred;
+        }
+    };
+    var currentSearch = {};
+
 	function queryEndpoint(endpoint, parameters, callback, onError){
 		if (typeof(parameters) === "function"){
 			onError = callback;
@@ -27,11 +143,10 @@ yox.data.sources.instagram = (function(){
 
 		var params = $.extend({ access_token: accessToken }, parameters);
 
-		$.ajax({
+		return $.ajax({
 			url: apiUrl + endpoint,
 			data: params,
 			dataType: 'jsonp',
-			jsonpCallback: "callback",
 			success: function(instagramData){
 				callback(instagramData);
 			},
@@ -78,7 +193,7 @@ yox.data.sources.instagram = (function(){
                     success: function(instagramData)
                     {
                         if (instagramData.data && instagramData.data.length){
-                            userData = getUserData(instagramData.data[0]);
+                            userData = convert.user(instagramData.data[0]);
                             cacheUser(username, userData);
                             callback(userData);
                         }
@@ -92,134 +207,6 @@ yox.data.sources.instagram = (function(){
                 });
             }
         })
-    }
-
-    function getUserData(instagramUser){
-        return {
-            name: instagramUser.full_name,
-            id: instagramUser.id,
-            avatar: instagramUser.profile_picture,
-            username: instagramUser.username,
-            website: instagramUser.website,
-            source: dataSourceName
-        };
-    }
-
-    function getComments(instagramComments){
-        var comments = [];
-        for (var i= 0, comment; comment = instagramComments[i]; i++){
-            comments.push({
-                id: comment.id,
-                time: new Date(comment.created_time * 1000),
-                user: getUserData(comment.from),
-                text: comment.text
-            });
-        }
-        
-        return comments;
-    }
-
-	/**
-	 * Converts an array of Instagram user objects to an array of Yox user objects.
-	 * @param users
-	 * @return {Array}
-	 */
-	function convertUsersData(users){
-		var usersData = [];
-		for (var i= 0, user; user = users[i]; i++){
-			usersData.push(getUserData(user));
-		}
-
-		return usersData;
-	}
-
-    function getImageData(imageData, options){
-        var image = imageData.images.standard_resolution,
-            itemData = {
-                originalId: imageData.id,
-                thumbnail: getThumbnailData(imageData.images.low_resolution),
-                url: image.url,
-                width: image.width,
-                height: image.height,
-                ratio: image.height / image.width,
-                link: imageData.link,
-                title: imageData.caption ? imageData.caption.text : null,
-                type: "image",
-                time: new Date(imageData.created_time * 1000),
-                social: {
-                    commentsCount: imageData.comments.count,
-                    comments: getComments(imageData.comments.data),
-                    likesCount: imageData.likes.count,
-                    like: imageData.user_has_liked,
-                    likes: convertUsersData(imageData.likes.data)
-                },
-                author: getUserData(imageData.user)
-            };
-
-        return itemData;
-    }
-
-    function getAlbumData(data, options){
-        var albumData = {
-            title: data.name,
-            id: data.id,
-            type: "image",
-            link: data.name,
-            data: { album: {
-                name: data.name,
-                url: data.url,
-                id: data.id
-            }},
-            thumbnail: {
-                src: "",
-                width: 306,
-                height: 306,
-                ratio: 1
-            }
-        };
-
-        return albumData;
-    }
-
-    function getThumbnailData(photo){
-        return {
-            src: photo.url,
-            width: photo.width,
-            height: photo.height,
-            ratio: photo.height / photo.width
-        };
-    }
-
-    function getItemsData(instagramData, options){
-        var itemsData = [];
-        if (instagramData){
-            for(var i=0, item; item = instagramData[i]; i++){
-                itemsData.push(getImageData(item));
-            }
-        }
-        return itemsData;
-    }
-
-    function getAlbumsData(source, callback, deferred){
-        var albums = [
-                { name: "My feed", url: "users/self/feed", id: "feed" },
-                { name: "Most popular", url: "media/popular", id: "popular" },
-                { name: "Images I liked", url: "users/self/media/liked", id: "liked" },
-                { name: "Recent", url: "users/self/media/recent", id: "recent" }
-            ],
-            albumsData = {
-                source: source,
-                sourceType: dataSourceName,
-                createThumbnails: true,
-                items: []
-            };
-
-        for(var i=0; i < albums.length; i++){
-            albumsData.items.push(getAlbumData(albums[i], source));
-        }
-
-        callback && callback(albumsData);
-        deferred.resolve(albumsData);
     }
 
     function  prepareGetUsers(endpoint){
@@ -249,7 +236,7 @@ yox.data.sources.instagram = (function(){
 
                 if (instagramData.data && instagramData.data.length){
                     for(var i= 0, user; user = instagramData.data[i]; i++){
-                        returnData.users.push(getUserData(user));
+                        returnData.users.push(convert.user(user));
                     }
                     callback(returnData);
                 }
@@ -303,32 +290,27 @@ yox.data.sources.instagram = (function(){
     }
 
     function loadData(source, callback, deferred){
-        if (source.url === "albums"){
-            getAlbumsData(source, callback, deferred);
-        }
-        else{
-            getFeedUrl(source, function(url){
-	            queryEndpoint(url, function(instagramData){
-                    var returnData = {
-                        source: source,
-                        sourceType: dataSourceName,
-                        createThumbnails: true,
-                        items: getItemsData(instagramData.data)
-                    };
+        getFeedUrl(source, function(url){
+            queryEndpoint(url, function(instagramData){
+                var returnData = {
+                    source: source,
+                    sourceType: dataSourceName,
+                    createThumbnails: true,
+                    items: convert.images(instagramData.data)
+                };
 
-                    if (instagramData.pagination){
-                        returnData.paging = {
-                            next: { url: instagramData.pagination.next_url.replace(apiUrl, ""), type: dataSourceName }
-                        }
+                if (instagramData.pagination && instagramData.pagination.next_url){
+                    returnData.paging = {
+                        next: { url: instagramData.pagination.next_url.replace(apiUrl, ""), type: dataSourceName }
                     }
+                }
 
-                    if (callback)
-                        callback(returnData);
+                if (callback)
+                    callback(returnData);
 
-                    deferred.resolve(returnData);
-                });
+                deferred.resolve(returnData);
             });
-        }
+        });
     }
 
     function findUsers(query, limit, callback){
@@ -338,7 +320,7 @@ yox.data.sources.instagram = (function(){
 	    }
 	    queryEndpoint("users/search", { q: query, count: limit }, function(instagramData){
 		    if (instagramData && instagramData.data){
-			    callback(convertUsersData(instagramData.data));
+			    callback(convert.users(instagramData.data));
 		    }
 		    else
 		        callback([]);
@@ -348,6 +330,16 @@ yox.data.sources.instagram = (function(){
     }
 
     var public = {
+        abortSearch: function(){
+            var jqXHR;
+            for(var searchType in currentSearch){
+                jqXHR = currentSearch[searchType];
+                if (jqXHR){
+                    jqXHR.abort();
+                    currentSearch[searchType] = null;
+                }
+            }
+        },
         feeds: [
             { name: "My feed", url: "users/self/feed", id: "feed" },
             { name: "Images I liked", url: "users/self/media/liked", id: "liked" },
@@ -363,7 +355,7 @@ yox.data.sources.instagram = (function(){
 	        queryEndpoint("media/" + item.originalId + "/likes", function(instagramData){
                     var likes;
                     if (instagramData.data)
-                        likes = convertUsersData(instagramData.data);
+                        likes = convert.users(instagramData.data);
                     else
                         likes = [];
 
@@ -401,7 +393,7 @@ yox.data.sources.instagram = (function(){
 	            if (/^\d+$/.test(userId)){
 		            queryEndpoint("users/" + (userId || "self"), function(instagramData){
 			            if (instagramData.data)
-				            var userData = getUserData(instagramData.data);
+				            var userData = convert.user(instagramData.data);
 			            else
 				            userData = { id: userId, source: dataSourceName };
 
@@ -464,15 +456,12 @@ yox.data.sources.instagram = (function(){
         name: dataSourceName,
         requireAuth: true,
         search: function(term, options, callback){
-            var dfd = $.Deferred();
-            if (!isLogin)
-                dfd.resolve(null);
+            var searchDeferreds = [];
+            for(var searchType in search){
+                searchDeferreds.push(search[searchType](term, options));
+            }
 
-            public.load({ url: "tags/" + term + "/media/recent" }, function(data){
-                callback && callback(data);
-                dfd.resolve(data);
-            });
-            return dfd.promise();
+            return searchDeferreds;
         },
         social: {
             like: function(itemId, callback){
