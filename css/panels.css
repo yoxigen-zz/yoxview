@@ -35,6 +35,16 @@
     font-weight: normal;
     position: relative;
 }
+#panels .panel h4{
+    margin: 0;
+    padding: 0 10px;
+    background: rgba(0,0,0,.2);
+    font-weight: normal;
+    height: 30px;
+    line-height: 30px;
+    border-bottom: solid 1px rgba(255,255,255,.1);
+    box-shadow: 0 1px 0px rgba(0,0,0,.2) inset, 0 -1px 0 rgba(0,0,0,.7) inset;
+}
 #panels .panel.open{
     -webkit-transform: translateX(-100%);
     -moz-transform: translateX(-100%);
@@ -55,4 +65,11 @@
 #search:focus{
     background: rgba(255,255,255,0.9);
     color: Black;
+}
+
+#panels .usersList{
+    overflow-y: auto;
+}
+#panels .tagsList{
+    padding: 10px 7px;
 }

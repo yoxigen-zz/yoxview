@@ -39,7 +39,7 @@ function SearchController($scope, search){
                 init();
 
             clearResults();
-            search.search($scope.searchTerm);
+            search.search($scope.searchTerm, { limit: 5 });
         }
     }
 }

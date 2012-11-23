@@ -102,11 +102,13 @@ yox.data.sources.instagram = (function(){
     };
 
     var search = {
-        tags: function(term){
+        tags: function(term, options){
             var deferred = $.Deferred();
             currentSearch.tags = queryEndpoint("tags/search", { q: term }, function(instagramData){
                 var result = { type: "tags" };
                 result.results = instagramData && instagramData.data ? convert.tags(instagramData.data) : [];
+                if (options.limit && result.results.length > options.limit)
+                    result.results = result.results.slice(0, options.limit);
                 deferred.resolve(result);
                 currentSearch.tags = null;
             },
@@ -122,6 +124,8 @@ yox.data.sources.instagram = (function(){
             currentSearch.users = queryEndpoint("users/search", { q: term, count: options.limit }, function(instagramData){
                 var result = { type: "users" };
                 result.results = instagramData && instagramData.data ? convert.users(instagramData.data) : [];
+                if (options.limit && result.results.length > options.limit)
+                    result.results = result.results.slice(0, options.limit);
                 deferred.resolve(result);
                 currentSearch.users = null;
             }, function(error){

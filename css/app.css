@@ -203,6 +203,9 @@ a:hover{
 .usersList li:first-child .userItem{
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 1) inset;
 }
+.usersList li:last-child .userItem{
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
+}
 .usersList.allLikes li:nth-last-child(2) .userItem{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
@@ -217,4 +220,29 @@ a:hover{
     height: 40px;
     width: 40px;
     border: solid 1px rgba(255,255,255,.2);
+}
+
+.tagsList{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.tagsList li{
+    display: inline-block;
+    border: solid 1px #333;
+    margin: 3px;
+    background: #a3d39c;
+    color: Black;
+    padding: 0 8px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 3px;
+    font-size: 10pt;
+}
+.tagsList li:hover{
+    background-color: White;
+}
+.tagsList a{
+    color: #111;
+    text-decoration: none;
 }

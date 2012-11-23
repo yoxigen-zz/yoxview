@@ -49,10 +49,10 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
 
         albumsApi.triggerEvent("createView", { item: thumbnailsApi.data.getItem(parseInt(itemIndexToShow, 10)) });
         $("body")
-            .on("focus", "#viewer textarea, #viewer input[type='text']", function(){
+            .on("focus", "textarea, input[type='text']", function(){
                 viewerApi.modules.controller.disableKeyboard();
             })
-            .on("blur", "#viewer textarea, #viewer input[type='text']", function(){
+            .on("blur", "textarea, input[type='text']", function(){
                 viewerApi.modules.controller.enableKeyboard();
             });
     }
