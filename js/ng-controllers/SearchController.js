@@ -12,7 +12,7 @@ function SearchController($scope, search){
         if (response.term !== $scope.searchTerm)
             return false;
 
-        $scope.$apply(function(){
+        $scope.safeApply(function(){
             var resultsType = $scope.results[response.type],
                 result;
 
