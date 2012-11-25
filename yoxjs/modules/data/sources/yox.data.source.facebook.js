@@ -471,9 +471,14 @@ yox.data.sources.facebook = (function(){
                 userId = null;
             }
 
-            if (!userId)
+            if (!userId){
                 userId = "me";
 
+	            var cacheUsers = cache().getItem("users");
+	            if (cacheUsers){
+		            return callback && callback(cacheUsers);
+	            }
+            }
             FB.api(userId + "/friends", function(result){
                 var returnData = {
                     users: convert.users(result.data)
@@ -483,6 +488,8 @@ yox.data.sources.facebook = (function(){
                     returnData.paging = result.paging;
 
                 callback(returnData);
+
+	            cache().setItem("users", returnData, { expiresIn: 86400 });
             });
         },
         getLikes: function(item, callback){
@@ -580,6 +587,21 @@ yox.data.sources.facebook = (function(){
         },
         name: dataSourceName,
         requireAuth: true,
+	    search: {
+		    users: function(term, options){
+			    var deferred = $.Deferred();
+			    public.getFollowedUsers(function(users){
+				    var result = { type: "users" };
+				    result.results = users || [];
+				    if (options.limit && result.results.length > options.limit)
+					    result.results = result.results.slice(0, options.limit);
+
+				    deferred.resolve(result);
+			    });
+
+			    return deferred;
+		    }
+	    },
         social: {
             comment: function(itemId, text, callback){
                 FB.api(itemId + "/comments", "post", { message: text }, function(response){

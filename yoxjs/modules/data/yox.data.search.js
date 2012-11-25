@@ -33,19 +33,20 @@ yox.data.search = (function(){
             }
         },
         search: function(term, options){
+	        options = options || {};
             if (!searchSources)
                 init();
 
             function searchSource(source){
-                searchDeferreds = source.search(term, options || {});
-                for(var deferredIndex = 0; deferredIndex < searchDeferreds.length; deferredIndex++){
-                    searchDeferreds[deferredIndex].done(function(results){
-                        eventBus.triggerEvent("onResults", $.extend({ term: term, source: source }, results));
-                    });
-                }
+	            for(var searchType in source.search){
+		            if (!options.types || ~options.types.indexOf(searchType)){
+			            source.search[searchType](term, options).done(function(results){
+				            eventBus.triggerEvent("onResults", $.extend({ term: term, source: source }, results));
+			            });
+		            }
+	            }
             }
 
-            var searchDeferreds;
             for(var i= 0, source; source = searchSources[i]; i++){
                 searchSource(source);
             }
