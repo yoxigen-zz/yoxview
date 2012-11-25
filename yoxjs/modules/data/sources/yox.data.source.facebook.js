@@ -53,7 +53,7 @@ yox.data.sources.facebook = (function(){
 			return comments;
 		},
 		fql: {
-			image: function(fqlPhoto){
+			image: function(fqlPhoto, users){
 				var image = fqlPhoto.images[0],
 					itemData = {
 						thumbnail: convert.fql.thumbnail(fqlPhoto.images[4]),
