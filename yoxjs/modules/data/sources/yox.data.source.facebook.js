@@ -590,11 +590,21 @@ yox.data.sources.facebook = (function(){
 	    search: {
 		    users: function(term, options){
 			    var deferred = $.Deferred();
-			    public.getFollowedUsers(function(users){
-				    var result = { type: "users" };
-				    result.results = users || [];
-				    if (options.limit && result.results.length > options.limit)
-					    result.results = result.results.slice(0, options.limit);
+			    public.getFollowedUsers(function(results){
+				    var result = { type: "users" },
+					    matches = [],
+					    nameParts,
+					    matchRegExp = new RegExp("^" + term);
+
+				    for(var i= 0, user; (user = results.users[i]) && (!options.limit || matches.length < options.limit); i++){
+					    nameParts = user.name.split(/\s/g);
+					    if (matchRegExp.test(nameParts[0]))
+					        matches.push(user);
+					    else if (matchRegExp.test(nameParts[nameParts.length - 1]))
+					        matches.push(user);
+				    }
+
+				    result.results = matches;
 
 				    deferred.resolve(result);
 			    });
