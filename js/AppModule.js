@@ -1,1 +1,8 @@
-angular.module("AppModule", ["PathModule", "ApisModule", "DelegateModule", "StateModule", "SearchModule"]);
+angular.module("AppModule", [
+	"PathModule",
+	"ApisModule",
+	"DelegateModule",
+	"StateModule",
+	"SearchModule",
+	"InputDirectives"
+]);
