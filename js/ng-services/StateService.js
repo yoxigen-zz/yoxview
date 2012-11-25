@@ -126,7 +126,7 @@ angular.module('StateModule', ["PathModule"])
 
         function loadFeed(feed, callback){
             if (currentFeed !== feed){
-                var sourceData = $.extend({ type: currentSource.name }, feed);
+                var sourceData = angular.extend({ type: currentSource.name }, feed);
                 eventBus.triggerEvent("feedChange", { feed: sourceData, onLoad: callback });
                 currentFeed = feed;
             }
@@ -292,7 +292,7 @@ angular.module('StateModule', ["PathModule"])
                 }
             },
             getLastState: function(){
-                return $.extend(true, {}, getLastHistory());
+                return angular.extend(true, {}, getLastHistory());
             },
             get mode(){
                 return currentMode;
