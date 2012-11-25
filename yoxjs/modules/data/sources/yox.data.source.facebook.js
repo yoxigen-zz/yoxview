@@ -9,55 +9,301 @@ yox.data.sources.facebook = (function(){
         initQueue = [],
         currentUserId;
 
-    if (/^http/.test(window.location.href)){
-        window.fbAsyncInit = function() {
-            isInit = true;
+	var convert = {
+		album: function(fbAlbum, fbAlbumCover){
+			var albumData = {
+				title: fbAlbum.name,
+				type: "image",
+				time: new Date(parseInt(fbAlbum.created, 10) * 1000),
+				link: fbAlbum.link,
+				author: {
+					id: fbAlbum.owner
+				},
+				data: { album: {
+					id: fbAlbum.object_id,
+					name: fbAlbum.name,
+					imageCount: fbAlbum.photo_count,
+					privacy: fbAlbum.visible,
+					canUpload: fbAlbum.can_upload,
+					url: fbAlbum.object_id + "/photos",
+					type: fbAlbum.type
+				}}
+			};
 
-            FB.init({
-                appId      : apiKey, // App ID
-                channelUrl : '//yoxigen.github.com/yoxview/channel.html', // Channel File
-                status     : true, // check login status
-                cookie     : true, // enable cookies to allow the server to access the session
-                xfbml      : true  // parse XFBML
-            });
+			if (fbAlbumCover && fbAlbumCover.images)
+				albumData.thumbnail = convert.thumbnail(fbAlbumCover.images[4]);
 
-            // listen for and handle auth.statusChange events
-            FB.Event.subscribe('auth.statusChange', function(response) {
-                console.log("auth status change: ", response);
-                if (loginCallback){
-                    if (response.authResponse) {
-                        isLogin = true;
-                        loginCallback(true);
-                    } else {
-                        loginCallback(false);
-                    }
-                }
+			return albumData;
+		},
+		comments: function(fbComments){
+			var comments = [];
+			for (var i= 0, comment; comment = fbComments[i]; i++){
+				comments.push({
+					id: comment.id,
+					time: yox.utils.date.parseDate(comment.created_time),
+					user: convert.user(comment.from),
+					text: comment.message,
+					social: {
+						likesCount: comment.like_count,
+						like: comment.user_likes
+					}
+				});
+			}
 
-                currentUserId = response.status === "connected" && response.authResponse.userID ? response.authResponse.userID : null;
-            });
+			return comments;
+		},
+		fql: {
+			image: function(fqlPhoto){
+				var image = fqlPhoto.images[0],
+					itemData = {
+						thumbnail: convert.fql.thumbnail(fqlPhoto.images[4]),
+						link: fqlPhoto.link,
+						url: image.source,
+						width: parseInt(image.width, 10),
+						height: parseInt(image.height, 10),
+						title: fqlPhoto.caption,
+						type: "image",
+						time: new Date(parseInt(fqlPhoto.created, 10) * 1000),
+						social: {
+							comments: [],
+							commentsCount: parseInt(fqlPhoto.comment_info.comment_count, 10),
+							likesCount: parseInt(fqlPhoto.like_info.like_count, 10),
+							like: fqlPhoto.like_info.user_likes,
+							likes: []
+						},
+						originalId: fqlPhoto.object_id
+					},
+					user = users[fqlPhoto.owner];
 
-            FB.getLoginStatus(function(e){
-                if (e.status === "connected")
-                    isLogin = true;
-            });
+				itemData.ratio = image.height / image.width;
 
-            if (initQueue.length){
-                for(var i=0; i < initQueue.length; i++){
-                    initQueue[i]();
-                }
-                initQueue = null;
-            }
-        };
+				if (user)
+					itemData.author = convert.fql.user(user);
 
-        // Load the SDK Asynchronously
-        (function(d){
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) {return;}
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-    }
+				if (fqlPhoto.tags && fqlPhoto.tags.data.length){
+					itemData.people = [];
+					for(var i= 0, tag; tag = fqlPhoto.tags.data[i]; i++){
+						itemData.people.push({ id: tag.id, name: tag.name });
+					}
+				}
+
+				return itemData;
+			},
+			user: function(fqlUser){
+				return {
+					id: fqlUser.id,
+					name: fqlUser.name,
+					avatar: fqlUser.pic_square,
+					source: dataSourceName
+				};
+			},
+			thumbnail: function(fbImage){
+				var data = {
+					src: fbImage.source,
+					width: parseInt(fbImage.width, 10),
+					height: parseInt(fbImage.height, 10)
+				};
+
+				data.ratio = data.height / data.width;
+				return data;
+			}
+		},
+		image: function(fbPhoto){
+			var image = fbPhoto.images[0],
+				itemData = {
+					thumbnail: convert.thumbnail(fbPhoto.images[4]),
+					url: image.source,
+					width: image.width,
+					height: image.height,
+					ratio: image.height / image.width,
+					link: fbPhoto.link,
+					title: fbPhoto.name,
+					type: "image",
+					author: convert.user(fbPhoto.from),
+					time: yox.utils.date.parseDate(fbPhoto.created_time),
+					social: {
+						comments: fbPhoto.comments ? convert.comments(fbPhoto.comments.data) : [],
+						commentsCount: fbPhoto.comments ? fbPhoto.comments.data.length : 0,
+						likes: fbPhoto.likes ? convert.users(fbPhoto.likes.data) : [],
+						likesCount: fbPhoto.likes ? fbPhoto.likes.data.length : 0
+					},
+					originalId: fbPhoto.id
+				};
+
+			if (fbPhoto.tags && fbPhoto.tags.data.length){
+				itemData.people = [];
+				for(var i= 0, tag; tag = fbPhoto.tags.data[i]; i++){
+					itemData.people.push({ id: tag.id, name: tag.name });
+				}
+			}
+
+			return itemData;
+		},
+		user: function(fbUser){
+			return {
+				id: fbUser.id,
+				name: fbUser.name,
+				avatar: "http://graph.facebook.com/" + fbUser.id + "/picture",
+				source: dataSourceName
+			};
+		},
+		users: function(fbUsers){
+			var usersData = [];
+			for (var i= 0, user; user = fbUsers[i]; i++){
+				usersData.push(convert.user(user));
+			}
+
+			return usersData;
+		},
+		thumbnail: function(fbImage){
+			return {
+				src: fbImage.source,
+				width: fbImage.width,
+				height: fbImage.height,
+				ratio: fbImage.height / fbImage.width
+			};
+		}
+	};
+
+	var feedsMethods = {
+		albums: function(user, callback){
+			function getUserAlbums(userId){
+				FB.api({
+					method: 'fql.multiquery',
+					queries: {
+						albums: "SELECT aid, object_id, cover_object_id, name, photo_count, can_upload, type, created, owner, link FROM album WHERE owner = " + userId,
+						photos: "SELECT object_id, images FROM photo WHERE object_id in (SELECT cover_object_id FROM #albums)"
+					}
+				}, function(response){
+					var albums = response[0].fql_result_set,
+						photos = response[1].fql_result_set;
+
+					function findPhoto(photoObjectId){
+						for(var j= 0, photo; photo = photos[j]; j++){
+							if (photo.object_id === photoObjectId){
+								return photos.splice(j, 1)[0];
+							}
+						}
+
+						return null;
+					}
+
+					var albumsData = [];
+					for(var i= 0, album; album = albums[i]; i++){
+						albumsData.push(convert.album(album, findPhoto(album.cover_object_id)));
+					}
+
+					callback(albumsData);
+				}, function(e){
+					console.error("Can't get Facebook albums for user " + userId + ". Error: ", e);
+					callback([]);
+				});
+			}
+
+			if (typeof(user) === "function"){
+				callback = user;
+				user = null;
+			}
+
+			if (user)
+				getUserAlbums(user);
+			if (!user){
+				public.getUser(function(userData){
+					getUserAlbums(userData.id);
+				});
+			}
+		},
+		streamPhotos: function(source, callback){
+			var sinceQuery = source.since ? " AND created_time < " + source.since.valueOf() / 1000 : "",
+				queries = source.friendsOnly ?
+				{
+					photos: "SELECT pid, object_id, owner, caption, created, images, like_info, comment_info, link FROM photo WHERE object_id in (SELECT attachment.media.photo.fbid FROM stream WHERE filter_key = 'app_2305272732'" + sinceQuery + " AND actor_id IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_hidden = 0 LIMIT " + source.pageSize +") LIMIT " + source.pageSize,
+					users: "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT owner FROM #photos)"
+				} :
+				{
+					photos: "SELECT pid, object_id, owner, caption, created, images, like_info, comment_info, link FROM photo WHERE object_id in (SELECT attachment.media.photo.fbid FROM stream WHERE filter_key = 'app_2305272732'" + sinceQuery + " AND is_hidden = 0 LIMIT " + source.pageSize +") LIMIT " + source.pageSize,
+					users: "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT owner FROM #photos)"
+				};
+
+			FB.api({
+				method: 'fql.multiquery',
+				queries: queries
+			}, function(response){
+				var photos = response[0].fql_result_set,
+					users = response[1].fql_result_set,
+					usersObj = {},
+					itemsData = [];
+
+				for(var i= 0, user; user = users[i]; i++){
+					usersObj[user.id] = user;
+				}
+
+				users = null;
+
+				var photo;
+				for(i = 0; photo = photos[i]; i++){
+					itemsData.push(convert.fql.image(photo, usersObj));
+				}
+
+				callback(itemsData);
+			});
+		}
+	};
+
+	function init(){
+	    if (/^http/.test(window.location.href)){
+	        window.fbAsyncInit = function() {
+	            isInit = true;
+	
+	            FB.init({
+	                appId      : apiKey, // App ID
+	                channelUrl : '//yoxigen.github.com/yoxview/channel.html', // Channel File
+	                status     : true, // check login status
+	                cookie     : true, // enable cookies to allow the server to access the session
+	                xfbml      : true  // parse XFBML
+	            });
+	
+	            // listen for and handle auth.statusChange events
+	            FB.Event.subscribe('auth.statusChange', function(response) {
+	                console.log("auth status change: ", response);
+	                if (loginCallback){
+	                    if (response.authResponse) {
+	                        isLogin = true;
+	                        loginCallback(true);
+	                    } else {
+	                        loginCallback(false);
+	                    }
+	                }
+	
+	                currentUserId = response.status === "connected" && response.authResponse.userID ? response.authResponse.userID : null;
+	            });
+	
+	            FB.getLoginStatus(function(e){
+	                if (e.status === "connected")
+	                    isLogin = true;
+	            });
+	
+	            if (initQueue.length){
+	                for(var i=0; i < initQueue.length; i++){
+	                    initQueue[i]();
+	                }
+	                initQueue = null;
+	            }
+	        };
+	
+	        // Load the SDK Asynchronously
+	        (function(d){
+	            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+	            if (d.getElementById(id)) {return;}
+	            js = d.createElement('script'); js.id = id; js.async = true;
+	            js.src = "//connect.facebook.net/en_US/all.js";
+	            ref.parentNode.insertBefore(js, ref);
+	        }(document));
+	    }
+	}
+	
+	init();
+	
     var cacheObj;
     function cache(){
         if (!cacheObj)
@@ -66,148 +312,11 @@ yox.data.sources.facebook = (function(){
         return cacheObj;
     }
 
-    /**
-     * Converts an array of Facebook user objects to an array of Yox user objects.
-     * @param users
-     * @return {Array}
-     */
-    function convertUsersData(users){
-        var usersData = [];
-        for (var i= 0, user; user = users[i]; i++){
-            usersData.push(getUserData(user));
-        }
-
-        return usersData;
-    }
-
-    function getUserData(data){
-        return {
-            id: data.id,
-            name: data.name,
-            avatar: "http://graph.facebook.com/" + data.id + "/picture",
-            source: dataSourceName
-        };
-    }
-
-    function getComments(fbComments){
-        var comments = [];
-        for (var i= 0, comment; comment = fbComments[i]; i++){
-            comments.push({
-                id: comment.id,
-                time: yox.utils.date.parseDate(comment.created_time),
-                user: getUserData(comment.from),
-                text: comment.message,
-                social: {
-                    likesCount: comment.like_count,
-                    like: comment.user_likes
-                }
-            });
-        }
-
-        return comments;
-    }
-
-    function getImageData(photoData, options){
-        var image = photoData.images[0],
-            itemData = {
-                thumbnail: getThumbnailData(photoData.images[4]),
-                url: image.source,
-                width: image.width,
-                height: image.height,
-                ratio: image.height / image.width,
-                link: photoData.link,
-                title: photoData.name,
-                type: "image",
-                author: getUserData(photoData.from),
-                time: yox.utils.date.parseDate(photoData.created_time),
-                social: {
-                    comments: photoData.comments ? getComments(photoData.comments.data) : [],
-                    commentsCount: photoData.comments ? photoData.comments.data.length : 0,
-                    likes: photoData.likes ? convertUsersData(photoData.likes.data) : [],
-                    likesCount: photoData.likes ? photoData.likes.data.length : 0
-                },
-                originalId: photoData.id
-            };
-
-        if (photoData.tags && photoData.tags.data.length){
-            itemData.people = [];
-            for(var i= 0, tag; tag = photoData.tags.data[i]; i++){
-                itemData.people.push({ id: tag.id, name: tag.name });
-            }
-        }
-
-        return itemData;
-    }
-
-    function getFqlUserData(data){
-        return {
-            id: data.id,
-            name: data.name,
-            avatar: data.pic_square,
-            source: dataSourceName
-        };
-    }
-
-    function getFqlImageData(photoData, users){
-        var image = photoData.images[0],
-            itemData = {
-                thumbnail: getFqlThumbnailData(photoData.images[4]),
-                link: photoData.link,
-                url: image.source,
-                width: parseInt(image.width, 10),
-                height: parseInt(image.height, 10),
-                title: photoData.caption,
-                type: "image",
-                time: new Date(parseInt(photoData.created, 10) * 1000),
-                social: {
-                    comments: [],
-                    commentsCount: parseInt(photoData.comment_info.comment_count, 10),
-                    likesCount: parseInt(photoData.like_info.like_count, 10),
-                    like: photoData.like_info.user_likes,
-                    likes: []
-                },
-                originalId: photoData.object_id
-            },
-            user = users[photoData.owner];
-
-        itemData.ratio = image.height / image.width;
-
-        if (user)
-            itemData.author = getFqlUserData(user);
-
-        if (photoData.tags && photoData.tags.data.length){
-            itemData.people = [];
-            for(var i= 0, tag; tag = photoData.tags.data[i]; i++){
-                itemData.people.push({ id: tag.id, name: tag.name });
-            }
-        }
-
-        return itemData;
-    }
-
-    function getThumbnailData(photo){
-        return {
-            src: photo.source,
-            width: photo.width,
-            height: photo.height,
-            ratio: photo.height / photo.width
-        };
-    }
-
-    function getFqlThumbnailData(photo){
-        var data = {
-            src: photo.source,
-            width: parseInt(photo.width, 10),
-            height: parseInt(photo.height, 10)
-        };
-
-        data.ratio = data.height / data.width;
-        return data;
-    }
+    
 
     function getPhotosData(fbData, options, callback){
         var itemsData = [],
-            dataFunction = getImageData,
+            dataFunction = convert.image,
             deferreds = [];
 
         for(var i=0, item; item = fbData[i]; i++){
@@ -257,116 +366,6 @@ yox.data.sources.facebook = (function(){
         });
     }
 
-    function getStreamPhotos(source, callback){
-        var sinceQuery = source.since ? " AND created_time < " + source.since.valueOf() / 1000 : "",
-            queries = source.friendsOnly ?
-                {
-                    photos: "SELECT pid, object_id, owner, caption, created, images, like_info, comment_info, link FROM photo WHERE object_id in (SELECT attachment.media.photo.fbid FROM stream WHERE filter_key = 'app_2305272732'" + sinceQuery + " AND actor_id IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_hidden = 0 LIMIT " + source.pageSize +") LIMIT " + source.pageSize,
-                    users: "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT owner FROM #photos)"
-                } :
-            {
-                photos: "SELECT pid, object_id, owner, caption, created, images, like_info, comment_info, link FROM photo WHERE object_id in (SELECT attachment.media.photo.fbid FROM stream WHERE filter_key = 'app_2305272732'" + sinceQuery + " AND is_hidden = 0 LIMIT " + source.pageSize +") LIMIT " + source.pageSize,
-                users: "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT owner FROM #photos)"
-            };
-
-        FB.api({
-            method: 'fql.multiquery',
-            queries: queries
-        }, function(response){
-            var photos = response[0].fql_result_set,
-                users = response[1].fql_result_set,
-                usersObj = {},
-                itemsData = [];
-
-            for(var i= 0, user; user = users[i]; i++){
-                usersObj[user.id] = user;
-            }
-
-            users = null;
-
-            var photo;
-            for(i = 0; photo = photos[i]; i++){
-                itemsData.push(getFqlImageData(photo, usersObj));
-            }
-
-            callback(itemsData);
-        });
-    }
-
-    function getAlbumData(fbAlbumData, fbCoverPhotoData){
-        var albumData = {
-            title: fbAlbumData.name,
-            type: "image",
-            time: new Date(parseInt(fbAlbumData.created, 10) * 1000),
-            link: fbAlbumData.link,
-            author: {
-                id: fbAlbumData.owner
-            },
-            data: { album: {
-                id: fbAlbumData.object_id,
-                name: fbAlbumData.name,
-                imageCount: fbAlbumData.photo_count,
-                privacy: fbAlbumData.visible,
-                canUpload: fbAlbumData.can_upload,
-                url: fbAlbumData.object_id + "/photos",
-                type: fbAlbumData.type
-            }}
-        };
-
-        if (fbCoverPhotoData && fbCoverPhotoData.images)
-            albumData.thumbnail = getThumbnailData(fbCoverPhotoData.images[4]);
-
-        return albumData;
-    }
-
-    function getAlbums(user, callback){
-        function getUSerAlbums(userId){
-            FB.api({
-                method: 'fql.multiquery',
-                queries: {
-                    albums: "SELECT aid, object_id, cover_object_id, name, photo_count, can_upload, type, created, owner, link FROM album WHERE owner = " + userId,
-                    photos: "SELECT object_id, images FROM photo WHERE object_id in (SELECT cover_object_id FROM #albums)"
-                }
-            }, function(response){
-                var albums = response[0].fql_result_set,
-                    photos = response[1].fql_result_set;
-
-                function findPhoto(photoObjectId){
-                    for(var j= 0, photo; photo = photos[j]; j++){
-                        if (photo.object_id === photoObjectId){
-                            return photos.splice(j, 1)[0];
-                        }
-                    }
-
-                    return null;
-                }
-
-                var albumsData = [];
-                for(var i= 0, album; album = albums[i]; i++){
-                    albumsData.push(getAlbumData(album, findPhoto(album.cover_object_id)));
-                }
-
-                callback(albumsData);
-            }, function(e){
-                console.error("Can't get Facebook albums for user " + userId + ". Error: ", e);
-                callback([]);
-            });
-        }
-
-        if (typeof(user) === "function"){
-            callback = user;
-            user = null;
-        }
-
-        if (user)
-            getUSerAlbums(user);
-        if (!user){
-            public.getUser(function(userData){
-                getUSerAlbums(userData.id);
-            });
-        }
-    }
-
     function getFeedUrl(source){
         if (source.url)
             return source.url;
@@ -412,7 +411,7 @@ yox.data.sources.facebook = (function(){
         }
         else if (source.id === "stream" || source.id === "stream_friends"){
             source.pageSize = source.pageSize || 25;
-            getStreamPhotos(source, function(items){
+            feedsMethods.streamPhotos(source, function(items){
                 returnData.items = items;
 
                 if (items.length > 0){
@@ -426,7 +425,7 @@ yox.data.sources.facebook = (function(){
             });
         }
         else if (source.id === "albums"){
-            getAlbums(source.userId, function(items){
+            feedsMethods.albums(source.userId, function(items){
                 returnData.items = items;
                 if(source.cache)
                     cache().setItem(source.id, { items: returnData.items }, { expiresIn: source.cacheTime }); // Albums are cached for 6 hours
@@ -460,7 +459,7 @@ yox.data.sources.facebook = (function(){
         ],
         getComments: function(item, callback){
             FB.api(item.originalId + "/comments", function(result){
-                var comments = getComments(result.data),
+                var comments = convert.comments(result.data),
                     paging = comments.length < item.social.commentsCount && result.paging ? result.paging : null;
 
                 callback({ comments: comments, paging: paging });
@@ -477,7 +476,7 @@ yox.data.sources.facebook = (function(){
 
             FB.api(userId + "/friends", function(result){
                 var returnData = {
-                    users: convertUsersData(result.data)
+                    users: convert.users(result.data)
                 };
 
                 if (result.paging)
@@ -492,7 +491,7 @@ yox.data.sources.facebook = (function(){
             }
 
             FB.api(item.social.likesPaging && item.social.likesPaging.next || item.originalId + "/likes", function(result){
-                var likes = convertUsersData(result.data),
+                var likes = convert.users(result.data),
                     paging = likes.length < item.social.likesCount && result.paging ? result.paging : null;
 
                 callback({ likes: likes, paging: paging });
