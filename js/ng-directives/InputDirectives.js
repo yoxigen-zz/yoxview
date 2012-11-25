@@ -7,7 +7,10 @@ angular.module("InputDirectives", [])
 					e.preventDefault();
 					var focusElement = document.querySelector(attrs.focusOnClick);
 					if (focusElement){
-						setTimeout(function(){ focusElement.focus(); }, 50);
+						setTimeout(function(){
+							focusElement.focus();
+							focusElement.select();
+						}, 50);
 					}
 				}, false);
 			}
