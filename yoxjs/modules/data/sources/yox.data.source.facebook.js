@@ -594,7 +594,7 @@ yox.data.sources.facebook = (function(){
 				    var result = { type: "users" },
 					    matches = [],
 					    nameParts,
-					    matchRegExp = new RegExp("^" + term);
+					    matchRegExp = new RegExp("^" + term, "i");
 
 				    for(var i= 0, user; (user = results.users[i]) && (!options.limit || matches.length < options.limit); i++){
 					    nameParts = user.name.split(/\s/g);
