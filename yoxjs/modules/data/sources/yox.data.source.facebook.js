@@ -33,7 +33,8 @@ yox.data.sources.facebook = (function(){
 
 			if (fbAlbumCover && fbAlbumCover.images){
 				albumData.thumbnail = convert.thumbnail(fbAlbumCover.images[4]);
-				console.log("cover: ", fbAlbumCover.images);
+				if (fbAlbumCover.images.length >= 8)
+					albumData.smallThumbnail = convert.thumbnail(fbAlbumCover.images[fbAlbumCover.images[8]]);
 			}
 			return albumData;
 		},
