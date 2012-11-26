@@ -206,6 +206,9 @@ a:hover{
 .itemsList li:last-child .item{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
+.itemsList li:only-child .item{
+	box-shadow: none;
+}
 .usersList.allLikes li:nth-last-child(2) .userItem{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
