@@ -457,8 +457,7 @@ yox.data.sources.facebook = (function(){
             { name: "News Feed (friends)", id: "stream_friends", friendsOnly: true, pageSize: 25 },
             { name: "My Photos", id: "photos", url: "me/photos/uploaded" },
             { name: "My Albums", id: "albums", cache: true, cacheTime: 6 * 3600, hasChildren: true, childrenType: "albums" },
-            { name: "Photos of me", url: "me/photos", id: "userPhotos" },
-            { name: "Friends", hasChildren: true, childrenType: "users", id: "friends", cache: true, cacheTime: 6 * 3600 }
+            { name: "Photos of me", url: "me/photos", id: "userPhotos" }
         ],
         getComments: function(item, callback){
             FB.api(item.originalId + "/comments", function(result){
