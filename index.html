@@ -205,7 +205,7 @@
                     </li>
                     <li ng-repeat="contact in likes">
                         <a class="innerLink userLink item" href="?/{{currentItem.source.sourceType.name}}/user/{{contact.id}}">
-                            <img class="avatar" ng-src="{{contact.avatar}}" />
+                            <img class="thumbnail avatar" ng-src="{{contact.avatar}}" />
                             {{contact.username || contact.name}}
                         </a>
                     </li>
