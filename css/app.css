@@ -179,14 +179,14 @@ a:hover{
 .source_flickr{ background-position: 0 -93px }
 
 
-.usersList{
+.itemsList{
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     padding: 0;
     margin: 0;
     list-style: none;
 }
-.usersList .userItem{
+.itemsList .item{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset, 0 -1px 0 rgba(0, 0, 0, .35) inset;
     height: 49px;
     line-height: 50px;
@@ -200,26 +200,28 @@ a:hover{
     text-overflow: ellipsis;
     padding-right: 10px;
 }
-.usersList li:first-child .userItem{
+.itemsList li:first-child .item{
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 1) inset;
 }
-.usersList li:last-child .userItem{
+.itemsList li:last-child .item{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
 .usersList.allLikes li:nth-last-child(2) .userItem{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
 
-.usersList .userItem:hover{
+.itemsList .item:hover{
     background: rgba(255,255,255,.1);
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset !important;
 }
-.usersList .userItem .avatar{
-    float: left;
-    margin: 3px 10px;
-    height: 40px;
+.itemsList .item .thumbnail{
+	float: left;
+	margin: 3px 10px;
+	height: 40px;
+	border: solid 1px rgba(255,255,255,.2);
+}
+.itemsList .item .avatar{
     width: 40px;
-    border: solid 1px rgba(255,255,255,.2);
 }
 
 .tagsList{

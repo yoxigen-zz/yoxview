@@ -67,9 +67,15 @@
     color: Black;
 }
 
+.searchResultsList{
+	padding: 0;
+	margin: 0;
+}
 #panels .usersList{
     overflow-y: auto;
 }
 #panels .tagsList{
     padding: 10px 7px;
 }
+
+.albumsList
