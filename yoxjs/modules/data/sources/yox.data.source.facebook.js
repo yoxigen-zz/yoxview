@@ -27,7 +27,8 @@ yox.data.sources.facebook = (function(){
 					canUpload: fbAlbum.can_upload,
 					url: fbAlbum.object_id + "/photos",
 					type: fbAlbum.type
-				}}
+				}},
+				source: dataSourceName
 			};
 
 			if (fbAlbumCover && fbAlbumCover.images)
@@ -207,7 +208,7 @@ yox.data.sources.facebook = (function(){
 
 			if (user)
 				getUserAlbums(user);
-			if (!user){
+			else {
 				public.getUser(function(userData){
 					getUserAlbums(userData.id);
 				});
@@ -588,6 +589,22 @@ yox.data.sources.facebook = (function(){
         name: dataSourceName,
         requireAuth: true,
 	    search: {
+		    albums: function(term, options){
+			    var deferred = $.Deferred();
+			    feedsMethods.albums(function(albums){
+				    var result = { type: "albums", results: [] },
+					    albumNameRegExp = new RegExp(term, "i");
+
+				    for(var i= 0, album; album = albums[i]; i++){
+					    if (albumNameRegExp.test(album.title))
+					        result.results.push(album);
+				    }
+
+				    deferred.resolve(result);
+			    });
+
+			    return deferred;
+		    },
 		    users: function(term, options){
 			    var deferred = $.Deferred();
 			    public.getFollowedUsers(function(results){

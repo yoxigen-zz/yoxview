@@ -243,6 +243,17 @@
                         </li>
                     </ul>
                 </section>
+                <section class="searchResults" ng-show="results.albums.length">
+                    <h4>Albums</h4>
+                    <ul class="searchResultsList albumsList">
+                        <li ng-repeat="album in results.albums">
+                            <a class="innerLink albumLink" href="?/{{album.source}}/album/{{album.data.album.id}}">
+                                <img class="albumCover" ng-src="{{album.thumbnail.src}}" />
+                                {{album.title}}
+                            </a>
+                        </li>
+                    </ul>
+                </section>
                 <section class="searchResults" ng-show="results.tags.length">
                     <h4>Tags</h4>
                     <ul class="searchResultsList tagsList">
