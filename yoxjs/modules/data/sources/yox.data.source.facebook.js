@@ -557,8 +557,8 @@ yox.data.sources.facebook = (function(){
 
             var firstName = user.name.split(" ")[0];
             return [
-                { name: "Photos of " + firstName, url: user.id + "/photos", id: "userPhotos" },
-                { name: firstName + "'s Photos", url: user.id + "/photos/uploaded", id: "photos" },
+                { name: "Photos of " + firstName, url: user.id + "/photos", id: "userPhotos", user: user.id },
+                { name: firstName + "'s Photos", url: user.id + "/photos/uploaded", id: "photos", user: user.id },
                 { name: firstName + "'s Albums", id: "albums", hasChildren: true, childrenType: "albums", userId: user.id }
             ];
         },
