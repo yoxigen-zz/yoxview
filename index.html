@@ -98,7 +98,7 @@
                         <span class="sourceUserName" ng-show="user.username">{{user.username}}</span>
                     </div>
                     <a ng-repeat="feed in user.feeds"
-                       ng-click="selectFeed(feed)"
+                       ng-click="selectFeed(feed, user)"
                        ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
                 </div>
             </nav>

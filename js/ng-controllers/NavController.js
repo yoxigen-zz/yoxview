@@ -112,9 +112,10 @@ function NavController($scope, path, apis, state){
         $scope.currentNav = 1;
     };
 
-    $scope.selectFeed = function(feed){
+    $scope.selectFeed = function(feed, user){
         state.pushState({
-            feed: feed
+            feed: feed,
+            user: user.id
         });
         /*
         if (feed.childrenType === "users"){
