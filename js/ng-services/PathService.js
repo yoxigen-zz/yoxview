@@ -17,7 +17,10 @@ angular.module('PathModule', []).factory('path', function() {
                         returnData.user = feedParts[2];
                         position = 3;
                     }
-
+                    else if (feedParts[1] === "tag" && feedParts.length > 2){
+                        returnData.tag = feedParts[2];
+                        position = 3;
+                    }
                     if (feedParts.length > position){
                         returnData.feed = feedParts[position++];
 

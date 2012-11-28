@@ -4,14 +4,19 @@ angular.module("DelegateModule", []).directive("delegate", function(){
         transclude: false,
         restrict: 'A',
         link: function postLink($scope, element, attrs) {
-            var delegateParts = attrs.delegate.split(":"),
-                handler = delegateParts[2].replace(/\(\)$/, "");
+            var delegates = attrs.delegate.split(/,\s?/g);
+            for(var i= 0, delegate; i < delegates.length; i++){
+                delegate = delegates[i];
 
-            $(element[0]).on(delegateParts[0], delegateParts[1], function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                $scope[handler].call(this, this, e);
-            });
+                var delegateParts = delegate.split(":"),
+                    handler = delegateParts[2].replace(/\(\)$/, "");
+
+                $(element[0]).on(delegateParts[0], delegateParts[1], function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $scope[handler].call(this, this, e);
+                });
+            }
         }
     };
 

@@ -1,6 +1,7 @@
 function AppController($scope, state){
     var views = ["home", "sources", "albums", "thumbnails"],
-        userUrlRegex = /\?\/(\w+)\/user\/([^\/\?$]+)/;
+        userUrlRegex = /\?\/(\w+)\/user\/([^\/\?$]+)/,
+        tagUrlRegex = /\?\/(\w+)\/tag\/([^\/\?$]+)/;
 
     $scope.view = views[0];
 
@@ -25,6 +26,16 @@ function AppController($scope, state){
 	        });
         }
     };
+
+    $scope.selectTag = function(target){
+        var tagMatch = target.href && target.href.match(tagUrlRegex);
+        if (tagMatch){
+            state.pushState({
+                source: tagMatch[1],
+                tag: tagMatch[2]
+            });
+        }
+    }
 
     state.onModeChange.addListener(function(e){
         $scope.safeApply(function(){
