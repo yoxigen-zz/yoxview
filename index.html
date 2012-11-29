@@ -221,16 +221,14 @@
         </div>
     </div>
     <div id="panels" delegate="click:.closePanelBtn:closePanel">
-        <div class="panel" ng-class="{open:openPanel=='search'}" ng-controller="SearchController">
+        <div id="searchPanel" class="panel" ng-class="{open:openPanel=='search'}" ng-controller="SearchController">
             <h3>
                 <a class="closePanelBtn" title="Close"></a>
-                Search
-            </h3>
-            <div id="searchBox">
+                Search:
                 <form ng-submit="search()">
                     <input type="text" ng-model="searchTerm" id="search" placeholder="Search for people, albums and places" />
                 </form>
-            </div>
+            </h3>
             <div id="searchResults">
                 <section class="searchResults" ng-show="results.users.length">
                     <h4>Users</h4>
