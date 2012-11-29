@@ -163,7 +163,7 @@ angular.module('StateModule', ["PathModule"])
                 itemIndex: state.itemIndex,
                 home: state.home || !state.source,
                 user: state.user || currentUser && currentUser.id,
-	            tag: state.tag || state.feed.tag
+	            tag: state.tag || (state.feed && state.feed.tag)
             };
         }
 
