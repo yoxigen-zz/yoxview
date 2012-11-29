@@ -77,6 +77,9 @@ angular.module('StateModule', ["PathModule"])
             if (state.home)
                 baseState.home = state.home;
 
+	        if (state.tag)
+	            baseState.tag = state.tag;
+
             return baseState;
         }
 
@@ -100,6 +103,9 @@ angular.module('StateModule', ["PathModule"])
 
             if (baseState1.home !== baseState2.home)
                 return false;
+
+	        if (baseState1.tag !== baseState2.tag)
+	            return false;
 
             return true;
         }
@@ -156,14 +162,19 @@ angular.module('StateModule', ["PathModule"])
                 view: state.view,
                 itemIndex: state.itemIndex,
                 home: state.home || !state.source,
-                user: state.user || currentUser && currentUser.id
+                user: state.user || currentUser && currentUser.id,
+	            tag: state.tag || state.feed.tag
             };
         }
 
         function setFeed(feed, state){
             function doSetFeed(){
-                if (currentFeed && state.source.name === currentSource.name && feed.id === currentFeed.id && (!currentUser || currentUser.id !== state.user))
-                    return;
+                if (currentFeed &&
+	                state.source.name === currentSource.name &&
+	                feed.id === currentFeed.id &&
+	                feed.tag === currentFeed.tag &&
+	                (!currentUser || currentUser.id !== state.user)
+                ) return;
 
                 feedAuthAndLoad(feed, function(){
                     if (state.view && currentMode === "thumbnails"){
@@ -236,9 +247,12 @@ angular.module('StateModule', ["PathModule"])
                     if (typeof(state.source) === "string")
                         state.source = yox.data.sources[state.source];
 
-                    if (!state.feed && !state.user)
-                        state.feed = state.source.feeds[0];
-
+                    if (!state.feed && !state.user){
+	                    if (state.tag)
+	                        state.feed = { tag: state.tag };
+	                    else
+                            state.feed = state.source.feeds[0];
+                    }
                     setSource(state.source, function(){
                         if (state.user){
                             if (currentUser && state.user === currentUser.id && state.feed)

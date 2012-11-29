@@ -57,6 +57,8 @@ angular.module('PathModule', []).factory('path', function() {
 
             if (state.user)
                 url.push("user", state.user);
+	        else if (state.tag)
+                url.push("tag", state.tag);
 
             if (state.feed){
                 url.push(state.feed);
