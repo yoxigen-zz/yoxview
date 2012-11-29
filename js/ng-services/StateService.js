@@ -249,7 +249,7 @@ angular.module('StateModule', ["PathModule"])
 
                     if (!state.feed && !state.user){
 	                    if (state.tag)
-	                        state.feed = { tag: state.tag };
+	                        state.feed = { tag: state.tag, name: "#" + state.tag };
 	                    else
                             state.feed = state.source.feeds[0];
                     }

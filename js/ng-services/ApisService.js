@@ -1,5 +1,5 @@
-angular.module('ApisModule', ["PathModule", "StateModule"])
-.factory('apis', function(path, state) {
+angular.module('ApisModule', ["PathModule", "StateModule", "TextsModule"])
+.factory('apis', function(path, state, texts) {
     var viewerApi,
         thumbnailsApi,
         albumsApi,
@@ -170,7 +170,7 @@ angular.module('ApisModule', ["PathModule", "StateModule"])
                 if (yox.utils.strings.isRtl(item.title))
                     title.dir = "rtl";
 
-                title.innerHTML = yox.utils.strings.trim(item.title, titleMaxLength, "&hellip;");
+                title.innerHTML = texts.formatText(yox.utils.strings.trim(item.title, titleMaxLength, "&hellip;"), item.source.sourceType.name);
                 bottomInfo.appendChild(title);
             }
         }

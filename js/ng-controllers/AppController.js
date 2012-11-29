@@ -32,7 +32,10 @@ function AppController($scope, state){
         if (tagMatch){
             state.pushState({
                 source: tagMatch[1],
-	            feed: { tag: tagMatch[2] },
+	            feed: {
+		            tag: tagMatch[2],
+		            name: "#" + tagMatch[2]
+	            },
                 tag: tagMatch[2]
             });
         }

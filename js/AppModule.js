@@ -4,5 +4,6 @@ angular.module("AppModule", [
 	"DelegateModule",
 	"StateModule",
 	"SearchModule",
-	"InputDirectives"
+	"InputDirectives",
+	"TextsModule"
 ]);

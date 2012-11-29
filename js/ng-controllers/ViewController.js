@@ -1,4 +1,4 @@
-function ViewController($scope, apis, state){
+function ViewController($scope, apis, state, texts){
     $scope.viewEnabled = false;
 
     var loadingFeed = false,
@@ -199,22 +199,7 @@ function ViewController($scope, apis, state){
 
     var linksRegex = /([@#][^\s$\:,\.\(\)\!\?\"\'@#]+|https?:\/\/[^\s$\!]+)/g;
     $scope.formatText = function(text){
-        return text ? text.replace(linksRegex, function(result){
-            var isExternalLink = /^h/.test(result),
-                href = isExternalLink ? result : "?/" + $scope.currentItem.source.sourceType.name + "/",
-                className = "innerLink";
-
-            if (/^#/.test(result)){
-                href = href + "tag/" + result.slice(1);
-                className += " tag_link";
-            }
-            else if (/^@/.test(result)){
-                href = href + "user/" + result.slice(1);
-                className += " userLink";
-            }
-
-            return "<a class='" + className + "' href=\"" + href + "\"" + (isExternalLink ? " target='_blank'" : "") + ">" + result + "</a>"
-        }) : null;
+	    texts.formatText(text, $scope.currentItem.source.sourceType.name);
     };
 
     function setCurrentItemComments(){
@@ -300,4 +285,4 @@ function ViewController($scope, apis, state){
 
 }
 
-ViewController.$inject = ["$scope", "apis", "state"];
+ViewController.$inject = ["$scope", "apis", "state", "texts"];
