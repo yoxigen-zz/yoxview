@@ -248,7 +248,7 @@
                         <li ng-repeat="album in results.albums">
                             <a class="innerLink albumLink item" href="?/{{album.source.name}}/albums/{{album.data.album.id}}">
                                 <img class="thumbnail albumCover" ng-src="{{album.smallThumbnail.src || album.thumbnail.src}}" />
-                                <span ng-show="currentSource" class="sourceIcon source_{{album.source.name}}"></span>
+                                <span class="sourceIcon source_{{album.source.name}}"></span>
                                 {{album.title}}
                             </a>
                         </li>
