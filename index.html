@@ -236,6 +236,7 @@
                         <li ng-repeat="user in results.users">
                             <a class="innerLink userLink item" href="?/{{user.source.name}}/user/{{user.id}}">
                                 <img class="thumbnail avatar" ng-src="{{user.avatar}}" />
+                                <span ng-show="currentSource" class="sourceIcon source_{{user.source.name}}"></span>
                                 {{user.username || user.name}}
                             </a>
                         </li>
@@ -247,6 +248,7 @@
                         <li ng-repeat="album in results.albums">
                             <a class="innerLink albumLink item" href="?/{{album.source.name}}/albums/{{album.data.album.id}}">
                                 <img class="thumbnail albumCover" ng-src="{{album.smallThumbnail.src || album.thumbnail.src}}" />
+                                <span ng-show="currentSource" class="sourceIcon source_{{album.source.name}}"></span>
                                 {{album.title}}
                             </a>
                         </li>

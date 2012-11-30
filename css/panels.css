@@ -74,6 +74,10 @@
 	padding: 0;
 	margin: 0;
 }
+.searchResultsList .sourceIcon{
+    float: right;
+    margin: 13px 0 0 5px;
+}
 
 #panels .tagsList{
     padding: 10px 7px;
