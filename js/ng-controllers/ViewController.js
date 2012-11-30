@@ -197,9 +197,8 @@ function ViewController($scope, apis, state, texts){
         });
     };
 
-    var linksRegex = /([@#][^\s$\:,\.\(\)\!\?\"\'@#]+|https?:\/\/[^\s$\!]+)/g;
     $scope.formatText = function(text){
-	    texts.formatText(text, $scope.currentItem.source.sourceType.name);
+	    return $scope.currentItem ? texts.formatText(text, $scope.currentItem.source.sourceType.name) : text;
     };
 
     function setCurrentItemComments(){
