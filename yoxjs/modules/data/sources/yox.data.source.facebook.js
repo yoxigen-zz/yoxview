@@ -464,8 +464,15 @@ yox.data.sources.facebook = (function(){
                     xhr = new XMLHttpRequest();
                 xhr.open("POST", url);
                 xhr.onreadystatechange = function(e){
-                    console.log("upload image got back: ", arguments);
-                    deferred.resolve(e);
+                    if (e.currentTarget.status === 200){
+                        var photoId = JSON.parse(e.currentTarget.response.replace(/↵/g, "")).id;
+                        FB.api(photoId, function(photoData){
+                            deferred.resolve(convert.image(photoData));
+                        });
+                    }
+                    else{
+                        deferred.reject(e);
+                    }
                 };
 
                 xhr.send(formData);
