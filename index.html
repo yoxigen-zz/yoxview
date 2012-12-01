@@ -109,10 +109,8 @@
         </div>
         <section id="albumsThumbnails" class="largeScroll" ng-show="view == 'albums'"></section>
         <section id="thumbnails" class="largeScroll" ng-show="view == 'thumbnails'"></section>
-        <section id="upload" ng-controller="UploadController">
-            <div id="dragPanel" class="drag-and-drop" on-drop="uploadFiles">
-                <div id="dragPanelText" class="drag-and-drop-zone">Drag image(s) here</div>
-            </div>
+        <section id="upload" ng-controller="UploadController" class="drag-and-drop" on-drop="uploadFiles">
+            <div id="dragPanelText" class="drag-and-drop-zone">Drag image(s) here</div>
         </section>
         <section id="login" ng-show="view == 'login'">
             <div id="loginContents">
