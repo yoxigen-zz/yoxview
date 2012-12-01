@@ -5,5 +5,6 @@ angular.module("AppModule", [
 	"StateModule",
 	"SearchModule",
 	"InputDirectives",
-	"TextsModule"
+	"TextsModule",
+    "DragAndDropModule"
 ]);

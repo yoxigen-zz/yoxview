@@ -460,7 +460,7 @@ yox.data.sources.facebook = (function(){
                 formData.append("source", imageFile);
                 formData.append("message", options.title);
 
-                var url = "https://graph.facebook.com/" + options.albumId + "/photos?access_token=" + FB.getAuthResponse().accessToken,
+                var url = "https://graph.facebook.com/" + (options.albumId || currentUser.id) + "/photos?access_token=" + FB.getAuthResponse().accessToken,
                     xhr = new XMLHttpRequest();
                 xhr.open("POST", url);
                 xhr.onreadystatechange = function(e){

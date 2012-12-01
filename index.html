@@ -16,6 +16,7 @@
     <link rel="Stylesheet" type="text/css" href="css/albums.css" />
     <link rel="Stylesheet" type="text/css" href="css/viewer.css" />
     <link rel="Stylesheet" type="text/css" href="css/panels.css" />
+    <link rel="Stylesheet" type="text/css" href="css/upload.css" />
     <script src="js/external/angular-1.0.1.min.js"></script>
     <script src="js/ga.js"></script>
 </head>
@@ -61,7 +62,6 @@
                         <a ng-repeat="feed in sourceFeeds"
                            ng-click="selectFeed(feed)"
                            ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
-                        <div><input type="file" id="fbUpload"><input type="button" id="testFBUpload" value="Upload"></div>
                     </div>
                 </nav>
                 <nav class="thumbnailsNav thumbnailsNav_3 smallNav" ng-show="currentFeed.childrenType == 'albums'" ng-cloak>
@@ -109,6 +109,11 @@
         </div>
         <section id="albumsThumbnails" class="largeScroll" ng-show="view == 'albums'"></section>
         <section id="thumbnails" class="largeScroll" ng-show="view == 'thumbnails'"></section>
+        <section id="upload" ng-controller="UploadController">
+            <div id="dragPanel" class="drag-and-drop" on-drop="uploadFiles">
+                <div id="dragPanelText" class="drag-and-drop-zone">Drag image(s) here</div>
+            </div>
+        </section>
         <section id="login" ng-show="view == 'login'">
             <div id="loginContents">
                 <a id="loginBtn" ng-click="login()" class="loginBtn_{{currentSource.provider.name}}"></a>
@@ -275,7 +280,7 @@
         </div>
     </div>
     <div id="fb-root"></div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
     <script type="text/javascript" src="yoxjs/polyfills/polyfill.bind.js"></script>
     <script type="text/javascript" src="yoxjs/polyfills/polyfill.classlist.js"></script>
@@ -313,11 +318,13 @@
     <script src="js/ng-services/StateService.js"></script>
     <script src="js/ng-services/SearchService.js"></script>
     <script src="js/ng-services/TextsService.js"></script>
+    <script src="js/ng-directives/DragAndDrop.js"></script>
     <script src="js/ng-directives/DelegateDirective.js"></script>
     <script src="js/ng-directives/InputDirectives.js"></script>
     <script src="js/ng-controllers/NavController.js"></script>
     <script src="js/ng-controllers/ViewController.js"></script>
     <script src="js/ng-controllers/AppController.js"></script>
+    <script src="js/ng-controllers/UploadController.js"></script>
     <script src="js/ng-controllers/SearchController.js"></script>
 </body>
 </html>
