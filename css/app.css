@@ -209,13 +209,13 @@ a:hover{
 .itemsList li:only-child .item{
 	box-shadow: none;
 }
-.usersList.allLikes li:nth-last-child(2) .item{
+.allLikes .usersList li:nth-last-child(2) .item{
     box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
 
 .itemsList .item:hover{
     background: rgba(255,255,255,.1);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset !important;
+    /* box-shadow: 0 1px 0 rgba(255, 255, 255, .08) inset !important; */
 }
 .itemsList .item .thumbnail{
 	float: left;

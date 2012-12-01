@@ -27,7 +27,7 @@
         <div id="headerMenu" delegate="click:.icon:togglePanel">
             <a class="icon" ng-class="{on:openPanel=='settings'}" id="settingsBtn" data-panel="settings" title="Settings"></a>
             <a class="icon" ng-class="{on:openPanel=='search'}" id="searchBtn" data-panel="search" title="Search" focus-on-click="#search"></a>
-            <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News"></a>
+            <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News" style="display: none"></a>
         </div>
         <h2 id="title">
             <span ng-show="currentSource" class="sourceIcon source_{{currentSource.provider.name}}"></span>
@@ -61,6 +61,7 @@
                         <a ng-repeat="feed in sourceFeeds"
                            ng-click="selectFeed(feed)"
                            ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
+                        <div><input type="file" id="fbUpload"><input type="button" id="testFBUpload" value="Upload"></div>
                     </div>
                 </nav>
                 <nav class="thumbnailsNav thumbnailsNav_3 smallNav" ng-show="currentFeed.childrenType == 'albums'" ng-cloak>

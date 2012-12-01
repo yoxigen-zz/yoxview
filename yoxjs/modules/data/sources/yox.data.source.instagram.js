@@ -430,8 +430,8 @@ yox.data.sources.instagram = (function(){
 		        currentSearch.tags = queryEndpoint("tags/search", { q: term }, function(instagramData){
 				        var result = { type: "tags" };
 				        result.results = instagramData && instagramData.data ? convert.tags(instagramData.data) : [];
-				        if (options.limit && result.results.length > options.limit)
-					        result.results = result.results.slice(0, options.limit);
+				        //if (options.limit && result.results.length > options.limit)
+					        //result.results = result.results.slice(0, options.limit);
 				        deferred.resolve(result);
 				        currentSearch.tags = null;
 			        },

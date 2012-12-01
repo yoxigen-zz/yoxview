@@ -79,6 +79,14 @@ function AppController($scope, state){
             this.$apply(fn);
         }
     };
+
+    /* TEMPORARY!!! */
+    document.getElementById("testFBUpload").onclick = function(){
+        var dfd = yox.data.sources.facebook.create.image(document.getElementById("fbUpload").files[0], { title: "Testing image" });
+        dfd.done(function(e){
+            console.log("DONE", e);
+        });
+    }
 }
 
 AppController.$inject = ["$scope", "state"];

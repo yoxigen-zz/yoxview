@@ -452,6 +452,26 @@ yox.data.sources.facebook = (function(){
     }
 
     var public = {
+        create: {
+            image: function(imageFile, options){
+                var formData = new FormData(),
+                    deferred = $.Deferred();
+
+                formData.append("source", imageFile);
+                formData.append("message", options.title);
+
+                var url = "https://graph.facebook.com/" + options.albumId + "/photos?access_token=" + FB.getAuthResponse().accessToken,
+                    xhr = new XMLHttpRequest();
+                xhr.open("POST", url);
+                xhr.onreadystatechange = function(e){
+                    console.log("upload image got back: ", arguments);
+                    deferred.resolve(e);
+                };
+
+                xhr.send(formData);
+                return deferred;
+            }
+        },
         feeds: [
             { name: "News Feed", id: "stream", pageSize: 25 },
             { name: "News Feed (friends)", id: "stream_friends", friendsOnly: true, pageSize: 25 },
