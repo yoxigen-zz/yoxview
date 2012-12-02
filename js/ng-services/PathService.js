@@ -60,12 +60,10 @@ angular.module('PathModule', []).factory('path', function() {
 	        else if (state.tag)
                 url.push("tag", state.tag);
 
-            if (state.feed){
+            if (state.feed)
                 url.push(state.feed);
-
-                if (state.child)
-                    url.push(state.child);
-            }
+            else if (state.album)
+                url.push("albums", state.album);
 
             if (state.view){
                 url.push("view");

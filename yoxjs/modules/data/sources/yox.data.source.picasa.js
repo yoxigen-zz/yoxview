@@ -125,7 +125,7 @@ yox.data.sources.picasa = (function(){
         {
             feedUrl += "user/" + picasaData.user;
             if (picasaData.album)
-                feedUrl += "/album/" + picasaData.album;
+                feedUrl += "/album/" + (Object(picasaData.album) === picasaData.album ? picasaData.album.id : picasaData.album);
         }
         else
             feedUrl += "all";
@@ -269,7 +269,7 @@ yox.data.sources.picasa = (function(){
         }
     }
 
-    function loadData(source, callback){console.log("load: ", source, new Error().stack)
+    function loadData(source, callback){
         var returnData = {
             source: source,
             sourceType: dataSourceName,
@@ -356,8 +356,8 @@ yox.data.sources.picasa = (function(){
             fields: "category(@term),entry(category(@term)),title,entry(summary),entry(media:group(media:thumbnail)),entry(media:group(media:content(@url))),entry(media:group(media:content(@width))),entry(media:group(media:content(@height))),entry(link[@rel='alternate'](@href)),entry(media:group(media:credit)),openSearch:totalResults,entry(gphoto:height),entry(gphoto:width),entry(author)"
         },
         feeds: [
-            { name: "My Albums", id: "userAlbums", hasChildren: true, user: "default", childrenType: "albums", cache: true, cacheTime: 6 * 3600 },
-            { name: "Featured Photos", id: "featured", url: "https://picasaweb.google.com/data/feed/api/featured" }
+            { name: "Featured Photos", id: "featured", url: "https://picasaweb.google.com/data/feed/api/featured" },
+            { name: "My Albums", id: "albums", hasChildren: true, user: "default", childrenType: "albums", cache: true, cacheTime: 6 * 3600 }
         ],
         getUser: getUser,
         getUserFeeds: function(user){
@@ -366,7 +366,7 @@ yox.data.sources.picasa = (function(){
 
             var firstName = user.name.split(" ")[0];
             return [
-                { name: firstName + "'s Albums", id: "userAlbums", hasChildren: true, user: user.id, childrenType: "albums" }
+                { name: firstName + "'s Albums", id: "albums", hasChildren: true, user: user.id, childrenType: "albums" }
             ];
         },
         isLoggedIn: function(callback){

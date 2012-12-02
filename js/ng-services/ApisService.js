@@ -109,10 +109,12 @@ angular.module('ApisModule', ["PathModule", "StateModule", "TextsModule"])
                 var itemIndex = parseInt(e.index, 10),
                     item = albumsApi.data.getData()[0].items[itemIndex];
 
-                if (window.history && window.history.pushState)
-                    window.history.pushState({ provider: item.source.sourceType.name, album: item.data.album }, "Album", "?/" + item.source.sourceType.name + "/" + item.data.album.id);
-
-                albumsApi.triggerEvent("openAlbum", { provider: item.source.sourceType, album: item.data.album });
+                if (e.originalEvent.target.nodeName !== "A"){
+                    state.pushState({
+                        source: item.source.sourceType,
+                        feed: { album: item.data.album.id, user: item.author.id }
+                    });
+                }
             },
             openAlbum: function(){
                 albumsApi.themes.wall.toggleHandleResize(false);

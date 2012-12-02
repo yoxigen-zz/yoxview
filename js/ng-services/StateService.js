@@ -65,8 +65,12 @@ angular.module('StateModule', ["PathModule"])
             if (state.source)
                 baseState.source = Object(state.source) === state.source ? state.source.name : state.source;
 
-            if (state.feed)
+            if (state.feed){
                 baseState.feed = Object(state.feed) === state.feed ? state.feed.id : state.feed;
+
+                if (state.feed.album)
+                    baseState.album = Object(state.feed.album) === state.feed.album ? state.feed.album.id : state.feed.album;
+            }
 
             if (state.view)
                 baseState.view = state.view;
@@ -106,6 +110,9 @@ angular.module('StateModule', ["PathModule"])
 
 	        if (baseState1.tag !== baseState2.tag)
 	            return false;
+
+            if (baseState1.album !== baseState2.album)
+                return false;
 
             return true;
         }
@@ -156,15 +163,21 @@ angular.module('StateModule', ["PathModule"])
         }
 
         function getPathState(state){
-            return {
+            var pathState = {
                 source: state.source && state.source.name,
                 feed: state.feed && state.feed.id,
                 view: state.view,
                 itemIndex: state.itemIndex,
                 home: state.home || !state.source,
                 user: state.user || currentUser && currentUser.id,
-	            tag: state.tag || (state.feed && state.feed.tag)
+	            tag: state.tag || (state.feed && state.feed.tag),
+                album: state.feed && state.feed.album
             };
+
+            if (Object(pathState.album) === pathState.album)
+                pathState.album = pathState.album.id;
+
+            return pathState;
         }
 
         function setFeed(feed, state){
@@ -173,6 +186,7 @@ angular.module('StateModule', ["PathModule"])
 	                state.source.name === currentSource.name &&
 	                feed.id === currentFeed.id &&
 	                feed.tag === currentFeed.tag &&
+                    feed.album === currentFeed.album &&
 	                (!currentUser || currentUser.id !== state.user)
                 ) return;
 

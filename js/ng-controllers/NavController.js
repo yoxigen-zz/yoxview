@@ -58,7 +58,7 @@ function NavController($scope, path, apis, state){
         }
     });
 
-    state.onFeedChange.addListener(function(e){
+    state.onFeedChange.addListener(function(e){console.log("onfeed: ", e);
         $scope.safeApply(function(){
             if ($scope.currentFeed)
                 $scope.currentFeed.selected = false;
@@ -71,8 +71,18 @@ function NavController($scope, path, apis, state){
                 }
             }
 
-            if (e.feed.hasChildren){
+            if (e.feed.hasChildren || e.feed.album){
                 $scope.currentNav = 2;
+
+                if (e.feed.album){
+                    if ($scope.currentAlbum)
+                        delete $scope.currentAlbum.selected;
+
+                    $scope.currentAlbum = findAlbumById(e.feed.album);
+                    if ($scope.currentAlbum){
+                        $scope.currentAlbum.selected = true;
+                    }
+                }
             }
             else{
                 $scope.currentNav = 1;
@@ -153,19 +163,23 @@ function NavController($scope, path, apis, state){
         //}
     };
 
+    function findAlbumById(albumId){
+        for(var i= 0, album; album = $scope.albums[i]; i++){
+            if (album.data.album.id === albumId){
+                return album;
+            }
+        }
+
+        return null;
+    }
+
     var albumIdToSelectAfterLoad;
     apis.albums.data.addEventListener("loadSources", function(sources){
         $scope.$apply(function(){
             if (sources && sources.length){
                 $scope.albums = sources[0].items;
                 if (albumIdToSelectAfterLoad){
-                    var albumToSelect;
-                    for(var i= 0, album; album = $scope.albums[i]; i++){
-                        if (album.data.album.id === albumIdToSelectAfterLoad){
-                            albumToSelect = album;
-                            break;
-                        }
-                    }
+                    var albumToSelect = findAlbumById(albumIdToSelectAfterLoad);
                     if (albumToSelect){
                         $scope.selectAlbum(albumToSelect);
                         $scope.$parent.view = "thumbnails";
@@ -181,29 +195,18 @@ function NavController($scope, path, apis, state){
         });
     });
 
-    apis.albums.addEventListener("click", function(e){
-        $scope.selectAlbum($scope.albums[e.index]);
-    });
-
-    $scope.selectAlbum = function(item, state){
+    $scope.selectAlbum = function(item){
         if ($scope.currentAlbum)
             delete $scope.currentAlbum.selected;
 
-        if (!state)
-            path.pushState({ source: $scope.currentSource.provider.name, feed: $scope.currentFeed.id, child: item.data.album.id });
-
-        apis.albums.triggerEvent("openAlbum", { provider: item.source.sourceType, album: item.data.album });
+        state.pushState({
+            source: item.source.sourceType,
+            feed: { album: item.data.album.id, user: item.author.id }
+        });
 
         item.selected = true;
         $scope.currentAlbum = item;
-        $scope.$emit("titleChange", [$scope.currentFeed, { name: item.data.album.name }]);
     };
-
-    apis.albums.addEventListener("openAlbum", function(){
-        $scope.safeApply(function(){
-            $scope.$parent.view = "thumbnails";
-        });
-    });
 
     $scope.back = function(){
         state.back();
