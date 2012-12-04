@@ -225,7 +225,7 @@
         </div>
     </div>
     <div id="panels" delegate="click:.closePanelBtn:closePanel">
-        <div id="searchPanel" class="panel" ng-class="{open:openPanel=='search'}" ng-controller="SearchController">
+        <div id="searchPanel" class="panel" ng-class="{open:openPanel=='search'}" ng-controller="SearchController" delegate="click:.innerLink:closePanel">
             <h3>
                 <a class="closePanelBtn" title="Close"></a>
                 Search:

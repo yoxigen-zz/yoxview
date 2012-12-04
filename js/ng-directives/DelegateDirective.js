@@ -9,7 +9,6 @@ angular.module("DelegateModule", []).directive("delegate", function(){
 	        function prepareHandler(scopeMethod){
 		        return function(e){
 			        e.preventDefault();
-			        e.stopPropagation();
 			        scopeMethod.call(this, this, e);
 		        };
 	        }
