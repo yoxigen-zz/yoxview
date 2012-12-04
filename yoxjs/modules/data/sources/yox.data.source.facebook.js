@@ -373,10 +373,11 @@ yox.data.sources.facebook = (function(){
         if (source.url)
             return source.url;
 
+        if (source.album)
+            return source.album + "/photos";
+
         if (source.user)
             return source.user + "/photos";
-        else if (source.album)
-            return source.album + "/photos";
 
         return null;
     }
