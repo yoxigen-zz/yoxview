@@ -201,7 +201,11 @@ function NavController($scope, path, apis, state){
 
         state.pushState({
             source: item.source.sourceType,
-            feed: { album: item.data.album.id, user: item.author.id }
+            feed: {
+                album: item.data.album.id,
+                user: item.author.id,
+                name: item.data.album.name
+            }
         });
 
         item.selected = true;
