@@ -36,7 +36,13 @@
 	position: relative;
 }
 #searchPanel h3{ font-size: 13pt }
-#panels .panel h3 form{ display: inline }
+#panels .panel h3 form{
+    position: absolute;
+    top: 0;
+    right: 4px;
+    left: 77px;
+    bottom: 0;
+}
 #panels .panel h4{
     margin: 0;
     padding: 0 10px;
@@ -54,7 +60,7 @@
 }
 
 #search{
-	width: 318px;
+	width: 100%;
 	border: solid 1px rgba(255,255,255,.2);
 	height: 25px;
 	padding: 0 7px;
@@ -62,7 +68,6 @@
 	background: rgba(255,255,255,0.2);
 	color: white;
 	outline: none;
-	float: right;
 	margin-top: 5px;
 }
 #search:focus{
