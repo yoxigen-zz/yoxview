@@ -140,6 +140,7 @@
         font-family: Arial, Sans-Serif;
         padding: 0 10px;
         background: rgba(0, 0, 0, .2);
+        font-style: normal;
     }
     [dir='rtl'] > .yox-theme-wall-thumbnailInfo_count{ float: left }
 

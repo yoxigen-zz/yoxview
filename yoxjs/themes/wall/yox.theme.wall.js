@@ -66,16 +66,17 @@ yox.themes.wall = function(data, options){
                 else if (options.createThumbnailInfo && (item.title || item.data && item.data.album)){
                     thumbnailInfo = document.createElement("span");
                     thumbnailInfo.className = classes.thumbnailInfo;
-                    thumbnailInfo.innerHTML = item.title;
                     if (yox.utils.strings.isRtl(item.title))
                         thumbnailInfo.dir = "rtl";
 
                     if (item.data && item.data.album && item.data.album.imageCount !== undefined){
-                        var imageCount = document.createElement("span");
+                        var imageCount = document.createElement("em");
                         imageCount.className = classes.thumbnailInfoCount;
                         imageCount.innerHTML = item.data.album.imageCount;
                         thumbnailInfo.appendChild(imageCount);
                     }
+
+                    thumbnailInfo.innerHTML = thumbnailInfo.innerHTML + item.title;
 
                     thumbnail.appendChild(thumbnailInfo);
                 }

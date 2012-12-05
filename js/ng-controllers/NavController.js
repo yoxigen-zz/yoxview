@@ -58,7 +58,7 @@ function NavController($scope, path, apis, state){
         }
     });
 
-    state.onFeedChange.addListener(function(e){console.log("onfeed: ", e);
+    state.onFeedChange.addListener(function(e){
         $scope.safeApply(function(){
             if ($scope.currentFeed)
                 $scope.currentFeed.selected = false;
