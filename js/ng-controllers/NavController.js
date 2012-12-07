@@ -109,7 +109,7 @@ function NavController($scope, path, apis, state){
     });
 
     state.onModeChange.addListener(function(e){
-        var nav = modeNavs[e.mode];
+        var nav = modeNavs[e.isAlbum ? "albums" : e.mode];
         if (nav !== undefined){
             $scope.safeApply(function(){
                 $scope.currentNav = nav;

@@ -196,8 +196,8 @@ angular.module('StateModule', ["PathModule"])
                         eventBus.triggerEvent("modeChange", { mode: "view" });
                     }
                     else if (!state.view && currentMode === "view"){
-                        currentMode = "thumbnails";
-                        eventBus.triggerEvent("modeChange", { mode: currentMode });
+                        currentMode = /albums/i.test(feed.id) ? "albums" : "thumbnails";
+                        eventBus.triggerEvent("modeChange", { mode: currentMode, isAlbum: !!feed.album });
                     }
                 });
             }
@@ -221,7 +221,7 @@ angular.module('StateModule', ["PathModule"])
 
                 if (newMode){
                     currentMode = newMode;
-                    eventBus.triggerEvent("modeChange", { mode: newMode });
+                    eventBus.triggerEvent("modeChange", { mode: newMode, isAlbum: !!state.feed.album });
                     // When a mode changes, it's necessary to wait until the UI changes before loading data, to avoid a situation where the thumbnails are not displayed and get a width/height of 0.
                     $timeout(doSetFeed, 1);
                 }
@@ -297,7 +297,7 @@ angular.module('StateModule', ["PathModule"])
             var stateView = !!state.view;
             if (stateView !== viewOpen){
                 eventBus.triggerEvent("viewStateChange", { isOpen: stateView, itemIndex: state.itemIndex || 0 });
-                eventBus.triggerEvent("modeChange", { mode: currentMode = (stateView ? "view" : "thumbnails") });
+                eventBus.triggerEvent("modeChange", { mode: currentMode = (stateView ? "view" : "thumbnails"), isAlbum: state.feed && !!state.feed.album });
                 viewOpen = stateView;
             }
 
