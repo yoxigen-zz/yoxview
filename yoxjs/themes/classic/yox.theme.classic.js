@@ -287,14 +287,38 @@ yox.themes.classic = function(data, options){
         return button;
     }
 
+    function drawArrow(canvas, radius, width, height){
+        var ctx = canvas.getContext("2d"),
+            diameter = 2 * radius;
+
+        ctx.translate(width / 2 + diameter, 0);
+        ctx.rotate(Math.PI / 4);
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "White";
+        ctx.beginPath();
+        ctx.moveTo(0, radius);
+        ctx.arcTo(0, height, radius, height, radius);
+        ctx.arcTo(width, height, width, height - radius, radius);
+        ctx.arcTo(width, height - diameter, width - radius, height - diameter, radius);
+        ctx.arcTo(diameter, height - diameter, diameter, height - 3 * radius, radius);
+        ctx.arcTo(diameter, radius, radius, 0, radius);
+        ctx.arcTo(0, 0, 0, radius, radius);
+        ctx.closePath();
+        ctx.fill();
+    }
+
     function createControlButton(method){
         var button = document.createElement("a"),
-            className = self.getThemeClass("controlBtn");
+            className = self.getThemeClass("controlBtn"),
+            icon = document.createElement("canvas");
 
         button.setAttribute("data-method", method);
         button.className = className + " " + className + "-" + method;
 
-        button.innerHTML = "<div></div>";
+        icon.width = 38;
+        icon.height = 52;
+        drawArrow(icon, 4, 38, 38);
+        button.appendChild(icon);
         return button;
     }
 

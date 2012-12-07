@@ -427,7 +427,7 @@ yox.data.sources.instagram = (function(){
         search: {
 	        tags: function(term, options){
 		        var deferred = $.Deferred();
-		        currentSearch.tags = queryEndpoint("tags/search", { q: term }, function(instagramData){
+		        currentSearch.tags = queryEndpoint("tags/search", { q: term.replace(/\s/g, "") }, function(instagramData){
 				        var result = { type: "tags" };
 				        result.results = instagramData && instagramData.data ? convert.tags(instagramData.data) : [];
 				        //if (options.limit && result.results.length > options.limit)

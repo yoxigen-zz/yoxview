@@ -434,16 +434,20 @@
         .yox-theme-classic-controlBtn-prev{ left: 0 }
         .yox-theme-classic-controlBtn-next{ right: 0; width: 66%; }
 
-    .yox-theme-classic-controlBtn div{
-        background-image: url(../img/yox.classic.sprites.png);
-        background-repeat: no-repeat;
+    .yox-theme-classic-controlBtn canvas{
         width: 33px;
         height: 49px;
         position: absolute;
         top: 50%; margin-top: -25px;
     }
-        .yox-theme-classic-controlBtn-prev div{ left: 30px; background-position: -194px -84px; }
-        .yox-theme-classic-controlBtn-next div{ right: 30px; background-position: -287px -84px; }
+        .yox-theme-classic-controlBtn-prev canvas{ left: 30px; }
+        .yox-theme-classic-controlBtn-next canvas{
+            right: 30px;
+            -webkit-transform: scaleX(-1);
+            -moz-transform: scaleX(-1);
+            -ms-transform: scaleX(-1);
+            transform: scaleX(-1);
+        }
 
 .yox-theme-classic-viewer{ height: 100%; overflow: hidden; }
 .yox-theme-classic-thumbnailsPanel{

@@ -9,32 +9,37 @@ yox.data.sources.picasa = (function(){
         currentUser,
         accessToken = localStorage.getItem("yox_picasa_token"),
         tokenExpires = accessToken ? new Date(parseInt(localStorage.getItem("yox_picasa_token_expires"), 10)) : null,
-        urlTokenMatch = /[&#\?]state=picasa[&$]/.test(window.location.href) && window.location.href.match(/access_token=([^&$]+)/);
+        urlTokenMatch = /[&#\?]state=picasa[&$]/.test(window.location.href) && window.location.href.match(/access_token=([^&$]+)/),
+        cacheObj;
 
-    checkTokenExpiry();
+    function init(){
+        checkTokenExpiry();
 
-    if (urlTokenMatch){
-        accessToken = urlTokenMatch[1];
-        tokenExpires = new Date(new Date().valueOf() + parseInt(window.location.href.match(/expires_in=(\d+)/)[1], 10) * 1000);
+        if (urlTokenMatch){
+            accessToken = urlTokenMatch[1];
+            tokenExpires = new Date(new Date().valueOf() + parseInt(window.location.href.match(/expires_in=(\d+)/)[1], 10) * 1000);
 
-        $.ajax({
-            url: "https://www.googleapis.com/oauth2/v1/tokeninfo",
-            dataType: 'jsonp',
-            data: { access_token: accessToken },
-            success: function(data)
-            {
-                if (data.error){
-                    console.log("Picasa authorization error: ", data.error);
-                    accessToken = null;
-                    tokenExpires = null;
+            $.ajax({
+                url: "https://www.googleapis.com/oauth2/v1/tokeninfo",
+                dataType: 'jsonp',
+                data: { access_token: accessToken },
+                success: function(data)
+                {
+                    if (data.error){
+                        console.log("Picasa authorization error: ", data.error);
+                        accessToken = null;
+                        tokenExpires = null;
+                    }
+                    else if (data.audience === clientId){
+                        localStorage.setItem("yox_picasa_token", accessToken);
+                        localStorage.setItem("yox_picasa_token_expires", tokenExpires.valueOf());
+                    }
                 }
-                else if (data.audience === clientId){
-                    localStorage.setItem("yox_picasa_token", accessToken);
-                    localStorage.setItem("yox_picasa_token_expires", tokenExpires.valueOf());
-                }
-            }
-        });
+            });
+        }
     }
+
+    init();
 
     function checkTokenExpiry(){
         if (accessToken && (!tokenExpires || tokenExpires < new Date())){
@@ -46,7 +51,6 @@ yox.data.sources.picasa = (function(){
         return true;
     }
 
-    var cacheObj;
     function cache(){
         if (!cacheObj)
             cacheObj = new yox.cache({ id: "picasa_source" });
@@ -329,6 +333,11 @@ yox.data.sources.picasa = (function(){
                     returnData.createThumbnails = true;
                     returnData.items = getImagesData(data, source, authorData);
 
+                    if (returnData.totalItems > picasaData["start-index"] + picasaData["max-results"] - 1)
+                        returnData.paging = {
+                            next:$.extend({}, source, { "start-index": picasaData["start-index"] + returnData.items.length })
+                        };
+
                     if (source.cache)
                         cache().setItem(source.id, { items: returnData.items, totalItems: returnData.totalItems }, { expiresIn: source.cacheTime }); // Albums are cached for 6 hours
                 }
@@ -351,13 +360,14 @@ yox.data.sources.picasa = (function(){
             alt: 'json',
             cropThumbnails: false,
             "max-results": 25,
+            "start-index": 1,
             thumbsize: 64,
             imgmax: picasaUncropSizes[picasaUncropSizes.length - 1],
             fields: "category(@term),entry(category(@term)),title,entry(summary),entry(media:group(media:thumbnail)),entry(media:group(media:content(@url))),entry(media:group(media:content(@width))),entry(media:group(media:content(@height))),entry(link[@rel='alternate'](@href)),entry(media:group(media:credit)),openSearch:totalResults,entry(gphoto:height),entry(gphoto:width),entry(author)"
         },
         feeds: [
             { name: "Featured Photos", id: "featured", url: "https://picasaweb.google.com/data/feed/api/featured" },
-            { name: "My Albums", id: "albums", hasChildren: true, user: "default", childrenType: "albums", cache: true, cacheTime: 6 * 3600 }
+            { name: "My Albums", id: "albums", hasChildren: true, user: "default", childrenType: "albums", cacheTime: 6 * 3600, "max-results": 999 }
         ],
         getUser: getUser,
         getUserFeeds: function(user){
