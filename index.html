@@ -167,18 +167,6 @@
                 <section id="comments_comments">
                     <h3>{{getCountStr(currentItem.social.commentsCount)}} <span>Comments</span></h3>
                     <ul id="comments_list" class="commentsList comments_section_contents">
-                        <li class="comment">
-                            <a class="comment_avatar"><img class="avatar" ng-src="{{currentUser.avatar}}" title="{{currentUser.username || currentUser.name}}" /></a>
-                            <div id="comments_comment_edit">
-                                <a id="writeCommentButton" ng-click="writeComment()" ng-show="!editingComment">Write a comment...</a>
-                                <div ng-show="editingComment" ng-class="{posting:postingComment}">
-                                    <textarea placeholder="Write a comment..." ng-model="commentWriteText" ng-disabled="postingComment"></textarea>
-                                    <input type="button" value="Post on {{currentItem.source.sourceType.sourceName}}" ng-disabled="postingComment" ng-click="postComment()" />
-                                    <img src="img/small_loader.png" class="loader" ng-show="postingComment" />
-                                </div>
-                            </div>
-
-                        </li>
                         <li ng-repeat="comment in currentItem.social.comments | orderBy:time:true" class="comment">
                             <a class="comment_avatar innerLink userLink" href="?/{{currentItem.source.sourceType.name}}/user/{{comment.user.id}}">
                                 <img class="avatar" ng-src="{{comment.user.avatar}}" title="{{comment.user.username || comment.user.name}}" />
@@ -192,6 +180,15 @@
                             </div>
                         </li>
                     </ul>
+                    <div id="comments_create">
+                        <a class="comment_avatar"><img class="avatar" ng-src="{{currentUser.avatar}}" title="{{currentUser.username || currentUser.name}}" /></a>
+                        <form id="comments_comment_edit" ng-submit="postComment()">
+                            <div ng-class="{posting:postingComment}">
+                                <textarea placeholder="Write a comment..." ng-model="commentWriteText" ng-disabled="postingComment"></textarea>
+                                <img src="img/small_loader.png" class="loader" ng-show="postingComment" />
+                            </div>
+                        </form>
+                    </div>
                 </section>
                 <div class="largeLoader" ng-show="commentsLoading"></div>
             </div>

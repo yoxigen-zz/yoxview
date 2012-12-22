@@ -573,8 +573,8 @@
             enlarge: false, // Whether to enlarge images to fit the container
             events: { // Predefined event handlers
                 init: function(){
-                    if (this.options.cacheImagesInBackground && this.items.length)
-                        yox.view.cache.cacheItem(this);
+                    //if (this.options.cacheImagesInBackground && this.items.length)
+                        //yox.view.cache.cacheItem(this);
 
                     // Need to trigger init only once per view:
                     this.removeEventListener("init");
