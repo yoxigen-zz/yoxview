@@ -27,7 +27,7 @@
             <img id="logo" src="img/logo.png" />
         </h1>
         <div id="headerMenu" delegate="click:.icon:togglePanel">
-            <a class="icon" ng-class="{on:menuIsOpen}" ng-click="menuIsOpen=!menuIsOpen" id="menuBtn" title="Menu"></a>
+            <a class="icon" ng-class="{on:menuIsOpen || !currentSource}" ng-click="menuIsOpen=!menuIsOpen" id="menuBtn" title="Menu"></a>
             <a class="icon" ng-class="{on:openPanel=='settings'}" id="settingsBtn" data-panel="settings" title="Settings"></a>
             <a class="icon" ng-class="{on:openPanel=='search'}" id="searchBtn" data-panel="search" title="Search" focus-on-click="#search"></a>
             <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News" style="display: none"></a>

@@ -33,4 +33,10 @@
         -moz-transform: translateX(0);
         transform: translateX(0);
     }
+
+    #panels{
+        top: 101px;
+        width: 100%;
+        max-width: 400px;
+    }
 }
