@@ -9,6 +9,8 @@ function AppController($scope, state){
         $scope.path = path;
     });
 
+    $scope.closeMenu = function(){ $scope.menuIsOpen = false; };
+
     function broadcastLogin(loginStatus){
         $scope.$broadcast(loginStatus ? "login" : "loginError", { source: $scope.currentSource });
     }

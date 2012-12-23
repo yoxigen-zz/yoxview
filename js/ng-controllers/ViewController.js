@@ -43,7 +43,7 @@ function ViewController($scope, apis, state, texts){
         apis.thumbnails.data.addEventListener("loadSources", onLoadData);
     });
 
-    $scope.commentsClosed = document.documentElement.clientWidth <= 1024;
+    $scope.commentsClosed = document.documentElement.clientWidth <= 800;
     $scope.openComments = function(){
         $scope.commentsClosed = false;
     };

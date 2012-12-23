@@ -17,6 +17,7 @@
     <link rel="Stylesheet" type="text/css" href="css/viewer.css" />
     <link rel="Stylesheet" type="text/css" href="css/panels.css" />
     <link rel="Stylesheet" type="text/css" href="css/upload.css" />
+    <link rel="Stylesheet" type="text/css" href="css/responsive.css" />
     <script src="js/external/angular-1.0.1.min.js"></script>
     <script src="js/ga.js"></script>
 </head>
@@ -26,6 +27,7 @@
             <img id="logo" src="img/logo.png" />
         </h1>
         <div id="headerMenu" delegate="click:.icon:togglePanel">
+            <a class="icon" ng-class="{on:menuIsOpen}" ng-click="menuIsOpen=!menuIsOpen" id="menuBtn" title="Menu"></a>
             <a class="icon" ng-class="{on:openPanel=='settings'}" id="settingsBtn" data-panel="settings" title="Settings"></a>
             <a class="icon" ng-class="{on:openPanel=='search'}" id="searchBtn" data-panel="search" title="Search" focus-on-click="#search"></a>
             <a class="icon" ng-class="{on:openPanel=='news'}" id="messagesBtn" data-panel="news" title="News" style="display: none"></a>
@@ -36,12 +38,12 @@
         </h2>
     </header>
     <section id="contents" ng-cloak>
-        <div id="navs" ng-controller="NavController" class="nav_depth_{{currentNav + 1}}">
+        <div id="navs" ng-controller="NavController" class="nav_depth_{{currentNav + 1}}" ng-class="{open:menuIsOpen || !currentSource}">
             <div id="navsWrap">
                 <nav id="accounts" class="thumbnailsNav thumbnailsNav_1" ng-cloak>
                     <div class="thumbnailsNav_scroll">
                         <a ng-repeat="source in sources"
-                           ng-click="selectSource(source)"
+                           ng-click="selectSource(source); closeMenu();"
                            class="folder"
                            ng-class="{selected:source.selected, loggedIn:source.currentUser}">
                         <span class='sourceIcon source_{{source.provider.name}}' ng-show="!source.currentUser.avatar"></span>
@@ -53,14 +55,14 @@
                 </nav>
                 <nav class="thumbnailsNav thumbnailsNav_2" ng-cloak>
                     <div class="thumbnailsNav_scroll">
-                        <a class="backNav" ng-click="home()"><span class="backIcon"></span>Back</a>
+                        <a class="backNav" ng-click="home(); menuIsOpen = false;"><span class="backIcon"></span>Back</a>
                         <div class="thumbnailsNav_sourceUser" ng-show="currentSource.currentUser">
                             <img class="sourceAvatar" ng-src="{{currentSource.currentUser.avatar}}" ng-show="currentSource.currentUser.avatar" />
                             <span class="sourceName">{{currentSource.provider.sourceName}}</span>
                             <span class="sourceUserName">{{currentSource.currentUser.username || currentSource.currentUser.name}}</span>
                         </div>
                         <a ng-repeat="feed in sourceFeeds"
-                           ng-click="selectFeed(feed)"
+                           ng-click="selectFeed(feed);closeMenu();"
                            ng-class="{selected:feed.selected, folder:feed.hasChildren}">{{feed.name}}<span class="folderIcon"></span></a>
                     </div>
                 </nav>
@@ -68,7 +70,7 @@
                     <div class="thumbnailsNav_scroll">
                         <a class="backNav" ng-click="back()"><span class="backIcon"></span>Back</a>
                         <a ng-repeat="album in albums | orderBy:'title'"
-                           ng-click="selectAlbum(album)"
+                           ng-click="selectAlbum(album); closeMenu();"
                            ng-class="{selected:album.selected}"
                            ng-show="album.data.album.imageCount"
                            dir="{{getDirection(album.title)}}"

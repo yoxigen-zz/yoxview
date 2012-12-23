@@ -1,0 +1,36 @@
+@media only screen and (max-width:800px){
+    #appName{
+        border-right: none;
+        box-shadow: 0 -1px 0 rgba(0, 0, 0, .5) inset;
+    }
+    #title{
+        left: 0;
+        top: 56px;
+        height: 44px;
+        line-height: 44px;
+        background: #222;
+        right: 0;
+        border-bottom: solid 1px #343434;
+        box-shadow: 0 -1px 0 #131313 inset;
+    }
+    #headerMenu #menuBtn{ display: block }
+
+    #contents{ top: 101px; }
+    #contents > section{ left: 0; }
+    #navs{
+        float: none;
+        position: absolute;
+        -webkit-transition: -webkit-transform 300ms ease-out;
+        -moz-transition: -moz-transform 300ms ease-out;
+        transition: transform 300ms ease-out;
+
+        -webkit-transform: translateX(-100%);
+        -moz-transform: translateX(-100%);
+        transform: translateX(-100%);
+    }
+    #navs.open{
+        -webkit-transform: translateX(0);
+        -moz-transform: translateX(0);
+        transform: translateX(0);
+    }
+}

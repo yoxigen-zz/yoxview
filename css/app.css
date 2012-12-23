@@ -97,6 +97,7 @@ a:hover{
     }
     #headerMenu .icon:hover{ background-color: rgba(255,255,255,.09); }
     #headerMenu .icon.on{ background-color: #8d0d62; }
+    #headerMenu #menuBtn{ background-image: url(../img/icons/menu.svg); display: none; }
     #headerMenu #messagesBtn{ background-image: url(../img/icons/message.png); }
     #headerMenu #searchBtn{ background-image: url(../img/icons/search.png); }
     #headerMenu #settingsBtn{ background-image: url(../img/icons/settings.png); }
