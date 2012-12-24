@@ -26,7 +26,8 @@ yox.themes.wall = function(data, options){
             loading: self.getThemeClass("loading"),
             resizing: self.getThemeClass("resizing"),
             loadedAll: self.getThemeClass("loadedAll")
-        };
+        },
+        lastRowWasFull;
 
     var thumbs = [],
         currentRowWidth = 0,
@@ -145,8 +146,6 @@ yox.themes.wall = function(data, options){
         measureScrollHeight();
     }
 
-    var lastRowWasFull;
-
     // This function does the resizing that creates the wall effect:
     function calculateDimensions(thumbnail, index, totalThumbnailsCount, isUpdate){
         currentRowWidth += thumbnail.dimensions.width;
@@ -200,9 +199,11 @@ yox.themes.wall = function(data, options){
             }
 
             if (options.fastScroll){
+                console.log("CHECKING", lastRowWasFull)
                 if (lastRowWasFull === false){
-                    rows[rows.length - 1] = rowElements;
-                    rowHeights[rowHeights.length - 1] = rowHeight;
+                    rows[Math.max(0, rows.length - 1)] = rowElements;
+                    console.log("rowheights: %d = %d", Math.max(0, rowHeights.length - 1), rowHeight)
+                    rowHeights[Math.max(0, rowHeights.length - 1)] = rowHeight;
 
                     for(var rowElementIndex = 0, rowElement; rowElement = rowElements[rowElementIndex]; rowElementIndex++){
                         showThumbnailImage(rowElement);
@@ -210,9 +211,11 @@ yox.themes.wall = function(data, options){
                 }
                 else{
                     rows.push(rowElements);
+                    console.log("push row %d = %d", rowHeights.length, rowHeight)
                     rowHeights.push(rowHeight);
                 }
 
+                console.log("lastRowWasFull", isFullRow);
                 lastRowWasFull = isFullRow;
             }
         }
@@ -235,7 +238,8 @@ yox.themes.wall = function(data, options){
         }
 
         visibleRows = null;
-        lastRowWasFull = null;
+        console.log("set null (updateThumbnails)");
+        //lastRowWasFull = null;
 
         if (options.fastScroll)
             fastScroll();
@@ -313,6 +317,7 @@ yox.themes.wall = function(data, options){
         rows = [];
         rowHeights = [];
         visibleRows = null;
+        console.log("setting null (clear)");
         lastRowWasFull = null;
 
         getContainerWidth();
@@ -435,7 +440,7 @@ yox.themes.wall = function(data, options){
     var handleResize = false,
         onResize;
 
-	function updateSize(){
+	function updateSize(){console.log("updateSize");
 		self.container.classList.add(classes.resizing);
 		getContainerWidth();
 		thumbs = [];
